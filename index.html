@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parish Mass Intentions</title>
+<style>
+:root{--primary:#7b1e1e;--gold:#c9a227;--bg:#f7f4ef;--card:#fff;--text:#222;--muted:#666;--line:#e5e0d8}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+header{background:linear-gradient(135deg,#7b1e1e,#4e1010);color:#fff;padding:28px 18px;text-align:center}
+header h1{margin:0 0 7px;font-size:clamp(25px,6vw,40px)}header p{margin:0;color:#f3df9b}
+main{max-width:900px;margin:auto;padding:20px 14px 50px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:18px;box-shadow:0 4px 15px #0000000d}
+h2{margin-top:0;color:var(--primary)}label{display:block;font-weight:700;margin:14px 0 6px}
+input,select,textarea{width:100%;padding:13px;border:1px solid #ccc;border-radius:9px;font-size:16px;background:#fff}
+textarea{min-height:100px;resize:vertical}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+button{border:0;border-radius:9px;padding:14px 18px;font-size:16px;font-weight:700;cursor:pointer}
+.primary{background:var(--primary);color:#fff}.secondary{background:#eee;color:#222}.amount{font-size:28px;font-weight:800;color:var(--primary)}
+.notice{padding:13px;border-radius:9px;background:#fff7dc;border-left:5px solid var(--gold);margin:12px 0}
+.payment{background:#faf7ee;border:1px dashed var(--gold);padding:18px;border-radius:12px}.hidden{display:none}
+.status{padding:12px;border-radius:9px;background:#eef8ef;margin-top:12px}
+small,.muted{color:var(--muted)}.footer{text-align:center;color:#777;font-size:13px;margin-top:25px}
+@media(max-width:650px){.grid{grid-template-columns:1fr}main{padding:12px}.card{padding:17px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Parish Mass Intentions</h1>
+  <p>Online Mass Intention Request</p>
+</header>
+
+<main>
+<section class="card">
+<h2>Request a Mass Intention</h2>
+<div class="notice"><b>Important:</b> Mass intentions may only be submitted <b>one day before the scheduled Mass</b>, subject to the parish cutoff.</div>
+
+<form id="intentionForm">
+<div class="grid">
+<div>
+<label for="name">Parishioner Name *</label>
+<input id="name" required placeholder="Full name">
+</div>
+<div>
+<label for="contact">Contact Number *</label>
+<input id="contact" required placeholder="09XXXXXXXXX">
+</div>
+</div>
+
+<label for="email">Email (optional)</label>
+<input id="email" type="email" placeholder="you@example.com">
+
+<label for="type">Intention Type *</label>
+<select id="type" required>
+<option value="">Select intention</option>
+<option value="Thanksgiving">Thanksgiving — ₱100</option>
+<option value="Birthday">Birthday — ₱100</option>
+<option value="Special Intention">Special Intention — ₱100</option>
+<option value="Souls / Eternal Repose">Souls / Eternal Repose — ₱100 total</option>
+</select>
+
+<label for="names">Name(s) / Intention *</label>
+<textarea id="names" required placeholder="Enter the name(s) or intention to be included in the Mass."></textarea>
+<small>For Souls / Eternal Repose, ₱100 covers all names entered in one request.</small>
+
+<div class="grid">
+<div>
+<label for="massDate">Preferred Mass Date *</label>
+<input id="massDate" type="date" required>
+</div>
+<div>
+<label for="massTime">Mass Time *</label>
+<select id="massTime" required>
+<option value="">Select date first</option>
+</select>
+</div>
+</div>
+
+<div id="availability" class="notice hidden"></div>
+
+<div class="payment">
+<h3>Payment</h3>
+<p>GCash Number</p>
+<strong style="font-size:22px">0927 835 9644</strong>
+<p class="muted">After submitting, follow the parish payment instructions and keep your GCash reference number.</p>
+<div>Total Offering: <span class="amount" id="amount">₱0</span></div>
+</div>
+
+<label for="gcashRef">GCash Reference Number *</label>
+<input id="gcashRef" required placeholder="Enter GCash reference number">
+
+<label for="proof">Payment Proof (optional for initial/manual verification)</label>
+<input id="proof" type="file" accept="image/*">
+<small>Do not upload passwords, PINs, or OTPs.</small>
+
+<br><br>
+<button class="primary" type="submit">Submit Mass Intention</button>
+</form>
+</section>
+
+<section id="result" class="card hidden">
+<h2>Request Submitted</h2>
+<div id="resultText"></div>
+<button class="secondary" onclick="window.print()">Print / Save Confirmation</button>
+</section>
+
+<section class="card">
+<h2>Check Request Status</h2>
+<div class="grid">
+<div>
+<label for="refSearch">Reference Number</label>
+<input id="refSearch" placeholder="MI-2026-000001">
+</div>
+<div style="display:flex;align-items:end"><button class="primary" style="width:100%" onclick="checkStatus()">Check Status</button></div>
+</div>
+<div id="statusResult"></div>
+</section>
+
+<p class="footer">Parish Mass Intentions System • For parish use</p>
+</main>
+
+<script>
+const MASS_SCHEDULES = {
+  // Replace these sample schedules with the parish's actual schedules.
+  "05:30":"5:30 AM",
+  "06:30":"6:30 AM",
+  "17:30":"5:30 PM",
+  "18:30":"6:30 PM"
+};
+const CUTOFF_HOUR = 20; // 8:00 PM on the day before the Mass
+const STORAGE_KEY = "parish_mass_intentions_demo";
+
+const dateInput=document.getElementById("massDate");
+const typeInput=document.getElementById("type");
+const amountEl=document.getElementById("amount");
+const timeInput=document.getElementById("massTime");
+const availability=document.getElementById("availability");
+
+function todayLocal(){
+  const d=new Date(); d.setHours(0,0,0,0); return d;
+}
+function yyyyMmDd(d){
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function updateAmount(){
+  amountEl.textContent = typeInput.value ? "₱100" : "₱0";
+}
+function populateTimes(){
+  timeInput.innerHTML="";
+  if(!dateInput.value){timeInput.innerHTML='<option value="">Select date first</option>';return;}
+  const chosen=new Date(dateInput.value+"T00:00:00");
+  const min=new Date(todayLocal()); min.setDate(min.getDate()+1);
+  if(chosen.getTime()!==min.getTime()){
+    availability.className="notice";
+    availability.textContent="Requests are accepted only one day before the Mass. Please select tomorrow's date.";
+    timeInput.innerHTML='<option value="">Date not available</option>';
+    return;
+  }
+  availability.className="notice";
+  availability.textContent="This Mass date is within the allowed one-day advance period. Availability will be checked by the parish system.";
+  Object.entries(MASS_SCHEDULES).forEach(([v,t])=>{
+    const o=document.createElement("option");o.value=v;o.textContent=t;timeInput.appendChild(o);
+  });
+}
+typeInput.addEventListener("change",updateAmount);
+dateInput.addEventListener("change",populateTimes);
+dateInput.min=yyyyMmDd(new Date(new Date().setDate(new Date().getDate()+1)));
+
+function getRecords(){return JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]")}
+function saveRecords(r){localStorage.setItem(STORAGE_KEY,JSON.stringify(r))}
+function makeRef(){
+  const n=getRecords().length+1;
+  return "MI-"+new Date().getFullYear()+"-"+String(n).padStart(6,"0");
+}
+
+document.getElementById("intentionForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const chosen=new Date(dateInput.value+"T00:00:00");
+  const tomorrow=new Date(todayLocal()); tomorrow.setDate(tomorrow.getDate()+1);
+  if(chosen.getTime()!==tomorrow.getTime()){
+    alert("Mass intentions can only be submitted one day before the Mass.");
+    return;
+  }
+  if(!timeInput.value){alert("Please select a valid Mass time.");return;}
+  const ref=makeRef();
+  const record={
+    ref,name:document.getElementById("name").value.trim(),
+    contact:document.getElementById("contact").value.trim(),
+    email:document.getElementById("email").value.trim(),
+    type:typeInput.value,names:document.getElementById("names").value.trim(),
+    massDate:dateInput.value,massTime:timeInput.value,
+    amount:100,gcashRef:document.getElementById("gcashRef").value.trim(),
+    status:"PENDING PAYMENT VERIFICATION",
+    createdAt:new Date().toISOString()
+  };
+  const records=getRecords();records.push(record);saveRecords(records);
+  document.getElementById("resultText").innerHTML=
+    `<div class="status"><b>Reference Number:</b> ${ref}<br>
+    <b>Status:</b> ${record.status}<br>
+    <b>Mass:</b> ${record.massDate} — ${MASS_SCHEDULES[record.massTime]}<br>
+    <b>Intention:</b> ${record.type}<br>
+    <b>Total:</b> ₱100<br><br>
+    Please keep your reference number. The parish office will verify the payment.</div>`;
+  document.getElementById("result").classList.remove("hidden");
+  window.scrollTo({top:document.getElementById("result").offsetTop-10,behavior:"smooth"});
+  e.target.reset();amountEl.textContent="₱0";timeInput.innerHTML='<option value="">Select date first</option>';
+});
+
+function checkStatus(){
+  const ref=document.getElementById("refSearch").value.trim().toUpperCase();
+  const r=getRecords().find(x=>x.ref===ref);
+  document.getElementById("statusResult").innerHTML=r?
+    `<div class="status"><b>${r.ref}</b><br>Status: <b>${r.status}</b><br>Mass: ${r.massDate} — ${MASS_SCHEDULES[r.massTime]||r.massTime}<br>Intention: ${r.type}</div>`:
+    `<div class="notice">No request found. Please check the reference number.</div>`;
+}
+updateAmount();
+</script>
+</body>
+</html>
