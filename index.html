@@ -55,9 +55,9 @@ footer{background:var(--deep);color:#eadfca;padding:28px 16px}.foot{max-width:11
 <div class="tile"><b>Donation</b><span class="small">You may include an optional donation with your request.</span></div>
 </div>
 
-<section id="request"><div class="title"><h3>Request a Mass Intention</h3><p>Select tomorrow's Mass, then add your intentions.</p></div>
+<section id="request"><div class="title"><h3>Request a Mass Intention</h3><p>Add one or more intentions, then choose the Mass date and time for each intention.</p></div>
 <div class="card">
-<div class="notice"><b>Important:</b> Mass intentions must be submitted at least <b>one day before the scheduled Mass</b>. You may also reserve future Mass dates in advance.</div>
+<div class="notice"><b>Important:</b> Mass intentions must be submitted at least <b>one day before the scheduled Mass</b>. You may reserve any future Mass date in advance.</div>
 <form id="form">
 <div class="grid">
 <div><label>Parishioner Name *</label><input id="parishioner" required placeholder="Full name"></div>
@@ -117,7 +117,7 @@ footer{background:var(--deep);color:#eadfca;padding:28px 16px}.foot{max-width:11
 <footer><div class="foot"><div><h4>St. Stephen the Protomartyr Parish</h4><p>San Esteban St., Guilid, Ligao City, Albay</p><p>st.stephenprotomartyrparish@gmail.com</p></div><div><h4>Mass Intentions</h4><p>Online request • One-day advance</p></div><div><h4>GCash</h4><p>0927 835 9644</p><p>Payment verification by parish staff</p></div></div></footer>
 
 <script>
-const KEY="sspp_mass_intentions_v7";
+const KEY="sspp_mass_intentions_v9";
 const RATE=100;
 const schedule={
 Mon:[["06:30","6:30 AM","English"],["17:15","5:15 PM","Bikol"]],
@@ -131,39 +131,22 @@ Sun:[["05:30","5:30 AM","Bikol"],["07:00","7:00 AM","Bikol"],["08:30","8:30 AM",
 function dayKey(d){return["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()]}
 function startOfToday(){let d=new Date();d.setHours(0,0,0,0);return d}
 function iso(d){return d.toISOString().slice(0,10)}
-const date=document.getElementById("date"),mass=document.getElementById("mass"),donation=document.getElementById("donation");
+const donation=document.getElementById("donation");
 let minimumDate=startOfToday(); minimumDate.setDate(minimumDate.getDate()+1);
-date.min=iso(minimumDate);
-date.addEventListener("change",loadSchedule);
-mass.addEventListener("change",updateScheduleInfo);
 donation.addEventListener("input",updateTotal);
-
-function loadSchedule(){
- mass.innerHTML="";
- const d=new Date(date.value+"T00:00:00");
- if(isNaN(d)||d<minimumDate){mass.innerHTML='<option value="">Date not available</option>';scheduleInfo.innerHTML='<div class="notice">Please select tomorrow or a future date. Same-day Mass intentions are not accepted.</div>';updateTotal();return}
- const list=schedule[dayKey(d)];
- const all=document.createElement("option"); all.value="ALL"; all.textContent="ALL MASSES ("+list.length+" Masses)"; mass.appendChild(all);
- list.forEach(x=>{let o=document.createElement("option");o.value=x[0];o.textContent=x[1]+" • "+x[2];mass.appendChild(o)});
- updateScheduleInfo();updateTotal();
-}
-function updateScheduleInfo(){
- if(!mass.value)return;
- const d=new Date(date.value+"T00:00:00"), list=schedule[dayKey(d)];
- if(mass.value==="ALL"){scheduleInfo.innerHTML='<div class="schedule"><b>Selected:</b> ALL MASSES <span class="tag">'+list.length+" Masses on this date</span></div>";return}
- const x=list.find(v=>v[0]===mass.value);
- scheduleInfo.innerHTML='<div class="schedule"><b>Selected Mass:</b> '+x[1]+' <span class="tag">'+x[2]+'</span></div>';
-}
+donation.addEventListener("change",updateTotal);
 
 let id=0;
 function addIntention(){
+ const container=document.getElementById("intentions");
+ if(!container)return;
  id++;
  const box=document.createElement("div");box.className="intention";box.dataset.id=id;
  box.innerHTML='<div class="intentionHead"><b>Intention #'+id+'</b><button type="button" class="remove" onclick="removeIntention(this)">Remove</button></div>'+
  '<label>Intention Type *</label><select class="itype" required><option value="">Select type</option><option value="Thanksgiving">For Thanksgiving</option><option value="Special Intention">For Special Intention</option><option value="Birthday Blessing">Thanksgiving and Birthday Blessing</option><option value="Fast Recovery">For fast recovery</option><option value="Souls">For the Soul</option></select>'+
  '<div class="dynamic"></div>'+
  '<label>Mass Schedule for this Intention *</label><div class="massSchedules"></div><button type="button" class="addMassSchedule mini" onclick="addMassSchedule(this)">+ Add Mass Schedule</button>';
- document.getElementById("intentions").appendChild(box);
+ container.appendChild(box);
  box.querySelector(".itype").addEventListener("change",()=>renderIntention(box));
  renderIntention(box); addMassSchedule(box.querySelector(".addMassSchedule"));
 }
@@ -215,6 +198,7 @@ function updateTotal(){
  document.getElementById("total").textContent="₱"+total.toLocaleString("en-PH");
 }
 document.getElementById("intentions").addEventListener("input",updateTotal);
+document.getElementById("intentions").addEventListener("change",updateTotal);
 document.getElementById("addIntentionBtn").addEventListener("click",addIntention);
 addIntention();
 
@@ -261,7 +245,7 @@ document.getElementById("form").addEventListener("submit",e=>{
  const r={ref,parishioner:parishioner.value.trim(),address:document.getElementById("address").value.trim(),contact:contact.value.trim(),email:email.value.trim(),intentions:items,donation:Number(donation.value)||0,total,gcashReference:gcashRef.value.trim(),status:"PENDING PAYMENT VERIFICATION",created:new Date().toISOString()};
  const a=records();a.push(r);save(a);showReceipt(r);
  result.className="status";result.innerHTML="<b>Request submitted successfully.</b><br>Reference: <b>"+ref+"</b><br>Total amount to pay: <b>₱"+total.toLocaleString("en-PH")+"</b><br>Status: <b>"+r.status+"</b><br><br>Keep your reference number for status checking.";
- e.target.reset();document.getElementById("intentions").innerHTML="";id=0;addIntention();updateTotal();
+ e.target.reset();donation.value=0;document.getElementById("intentions").innerHTML="";id=0;addIntention();updateTotal();
 });
 function checkStatus(){
  const q=document.getElementById("ref").value.trim().toUpperCase(),r=records().find(x=>x.ref===q);
