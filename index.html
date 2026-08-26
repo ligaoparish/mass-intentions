@@ -63,8 +63,7 @@ footer{background:var(--deep);color:#eadfca;padding:28px 16px}.foot{max-width:11
 <div><label>Parishioner Name *</label><input id="parishioner" required placeholder="Full name"></div>
 <div><label>Contact Number *</label><input id="contact" required placeholder="09XXXXXXXXX"></div><div><label>Barangay / Address (Optional)</label><input id="address" placeholder="Optional"></div>
 <div><label>Email</label><input id="email" type="email" placeholder="Optional"></div>
-<div><label>Mass Date *</label><input id="date" type="date" required></div>
-<div class="full"><label>Mass Schedule *</label><select id="mass" required><option value="">Select Mass date first</option></select><div id="scheduleInfo"></div></div>
+<div class="full"><div class="notice"><b>Mass Schedule:</b> Each intention can be assigned to one or more specific Mass dates and times. You may add different dates/times for different intentions.</div></div>
 </div>
 
 <div class="intentions">
@@ -162,10 +161,11 @@ function addIntention(){
  const box=document.createElement("div");box.className="intention";box.dataset.id=id;
  box.innerHTML='<div class="intentionHead"><b>Intention #'+id+'</b><button type="button" class="remove" onclick="removeIntention(this)">Remove</button></div>'+
  '<label>Intention Type *</label><select class="itype" required><option value="">Select type</option><option value="Thanksgiving">For Thanksgiving</option><option value="Special Intention">For Special Intention</option><option value="Birthday Blessing">Thanksgiving and Birthday Blessing</option><option value="Fast Recovery">For fast recovery</option><option value="Souls">For the Soul</option></select>'+
- '<div class="dynamic"></div>';
+ '<div class="dynamic"></div>'+
+ '<label>Mass Schedule for this Intention *</label><div class="massSchedules"></div><button type="button" class="addOffered mini" onclick="addMassSchedule(this)">+ Add Mass Schedule</button>';
  document.getElementById("intentions").appendChild(box);
  box.querySelector(".itype").addEventListener("change",()=>renderIntention(box));
- renderIntention(box);
+ renderIntention(box); addMassSchedule(box.querySelector(".addOffered"));
 }
 function renderIntention(box){
  const type=box.querySelector(".itype").value,d=box.querySelector(".dynamic");let s="";
@@ -173,7 +173,7 @@ function renderIntention(box){
  if(type==="Special Intention")s='<label>For Special Intention *</label><input class="subject" required placeholder="Enter special intention"><label>Offered by</label><div class="offeredList"></div><button type="button" class="addOffered mini" onclick="addOffered(this)">+ Add Offered by</button>';
  if(type==="Birthday Blessing")s='<label>Thanksgiving and Birthday Blessing of *</label><input class="subject" required placeholder="Name"><label>Offered by</label><div class="offeredList"></div><button type="button" class="addOffered mini" onclick="addOffered(this)">+ Add Offered by</button>';
  if(type==="Fast Recovery")s='<label>For fast recovery of *</label><input class="subject" required placeholder="Name"><label>Offered by</label><div class="offeredList"></div><button type="button" class="addOffered mini" onclick="addOffered(this)">+ Add Offered by</button>';
- if(type==="Souls")s='<label>For the Soul of *</label><textarea class="souls" required placeholder="Enter one or more names of the deceased, one per line."></textarea><div class="small">Each name is counted as one soul.</div><label>Offered by</label><div class="offeredList"></div><button type="button" class="addOffered mini" onclick="addOffered(this)">+ Add Offered by</button>';
+ if(type==="Souls")s='<label>For the Soul of *</label><textarea class="souls" required placeholder="Enter one or more names of the deceased, one per line."></textarea><div class="small">Each name is counted separately.</div><label>Offered by</label><div class="offeredList"></div><button type="button" class="addOffered mini" onclick="addOffered(this)">+ Add Offered by</button>';
  d.innerHTML=s;
  if(s)addOffered(d.querySelector(".addOffered"));
  updateTotal();
@@ -183,11 +183,28 @@ function addOffered(btn){
  row.className="offeredRow";row.innerHTML='<input class="offered" required placeholder="Name to appear"><button type="button" class="remove mini" onclick="this.parentElement.remove();updateTotal()">Remove</button>';
  list.appendChild(row);updateTotal();
 }
+function addMassSchedule(btn){
+ const box=btn.closest(".intention"),list=box.querySelector(".massSchedules"),row=document.createElement("div");
+ row.className="massRow";
+ row.innerHTML='<div class="grid"><div><label>Date *</label><input class="imassDate" type="date" required></div><div><label>Mass *</label><select class="imassTime" required><option value="">Select date first</option></select></div></div><button type="button" class="remove mini" onclick="this.parentElement.remove();updateTotal()">Remove Mass</button>';
+ list.appendChild(row);
+ const d=row.querySelector(".imassDate"),s=row.querySelector(".imassTime");
+ let min=new Date();min.setHours(0,0,0,0);min.setDate(min.getDate()+1);d.min=iso(min);
+ d.addEventListener("change",()=>loadIntentionMasses(d,s));
+ updateTotal();
+}
+function loadIntentionMasses(d,s){
+ s.innerHTML='<option value="">Select Mass</option>';
+ const val=d.value;if(!val)return;
+ const selected=new Date(val+"T00:00:00"),min=new Date();min.setHours(0,0,0,0);min.setDate(min.getDate()+1);
+ if(selected<min){s.innerHTML='<option value="">Date unavailable</option>';return}
+ (schedule[dayKey(selected)]||[]).forEach(x=>{let o=document.createElement("option");o.value=x[0];o.textContent=x[1]+" • "+x[2];s.appendChild(o)});
+ updateTotal();
+}
 function removeIntention(btn){btn.closest(".intention").remove();updateTotal()}
 function soulsCount(text){return text.split(/\n|,/).map(x=>x.trim()).filter(Boolean).length}
-function massCount(){if(!mass.value)return 0;if(mass.value==="ALL"){const d=new Date(date.value+"T00:00:00");return schedule[dayKey(d)]?.length||0}return 1}
 function intentionAmount(box){
- const type=box.querySelector(".itype").value,offered=box.querySelectorAll(".offered").length,masses=massCount();
+ const type=box.querySelector(".itype").value,offered=box.querySelectorAll(".offered").length,masses=box.querySelectorAll(".massRow").length;
  if(!type||!masses)return 0;
  const chargeable=type==="Souls"?soulsCount(box.querySelector(".souls")?.value||""):1;
  return (chargeable + Math.max(0,offered-1))*RATE*masses;
@@ -209,7 +226,7 @@ function showReceipt(r){
  document.getElementById("rcptName").textContent=r.parishioner;document.getElementById("rcptAddress").textContent=r.address||"";document.getElementById("rcptContact").textContent=r.contact||"";
  document.getElementById("rcptWords").textContent=amountWords(r.total);document.getElementById("rcptFigures").textContent="₱"+Number(r.total).toLocaleString("en-PH",{minimumFractionDigits:2});
  document.getElementById("rcptTotal").textContent="₱"+Number(r.total).toLocaleString("en-PH",{minimumFractionDigits:2});
- document.getElementById("rcptIntentions").innerHTML=r.intentions.map(x=>"• "+x.wording+" <span style='font-size:11px'>(applies to "+(r.massSelection==="ALL"?"ALL MASSES":"selected Mass")+")</span>").join("<br>")+(r.donation>0?"<br>• Donation":"");
+ document.getElementById("rcptIntentions").innerHTML=r.intentions.map(x=>"• "+x.wording+"<br><span style=\"margin-left:14px;font-size:12px\">"+x.schedules.map(v=>v.date+" • "+v.timeLabel+" • "+v.language).join("<br>")+"</span>").join("<br><br>")+(r.donation>0?"<br><br>• Donation":"");
  document.getElementById("rcptRef").textContent=r.ref;document.getElementById("rcptStatus").textContent=r.status;
  document.getElementById("receiptPrint").scrollIntoView({behavior:"smooth"});
 }
@@ -219,30 +236,35 @@ function newRef(){return"MI-"+new Date().getFullYear()+"-"+String(records().leng
 
 document.getElementById("form").addEventListener("submit",e=>{
  e.preventDefault();
- if(!date.value||new Date(date.value+"T00:00:00")<minimumDate){alert("Mass intentions must be submitted at least one day before the Mass.");return}
- if(!mass.value){alert("Please select a Mass.");return}
  const boxes=[...document.querySelectorAll(".intention")];
  const items=boxes.map(box=>{
   const type=box.querySelector(".itype").value,subject=box.querySelector(".subject")?.value.trim()||"",souls=box.querySelector(".souls")?.value.trim()||"",offered=[...box.querySelectorAll(".offered")].map(x=>x.value.trim());
+  const schedules=[...box.querySelectorAll(".massRow")].map(row=>{
+   const d=row.querySelector(".imassDate").value,t=row.querySelector(".imassTime").value;
+   const dt=d?new Date(d+"T00:00:00"):null,key=dt?dayKey(dt):null,x=key&&schedule[key]?schedule[key].find(v=>v[0]===t):null;
+   return {date:d,time:t,timeLabel:x?.[1]||"",language:x?.[2]||""};
+  });
   let wording="";
   if(type==="Thanksgiving")wording="For Thanksgiving offered by: "+offered.join("; ");
   if(type==="Special Intention")wording="For Special Intention "+subject+" offered by: "+offered.join("; ");
   if(type==="Birthday Blessing")wording="Thanksgiving and Birthday Blessing of "+subject+" offered by: "+offered.join("; ");
   if(type==="Fast Recovery")wording="For fast recovery of "+subject+" offered by: "+offered.join("; ");
   if(type==="Souls")wording="For the Soul of "+souls.split(/\n|,/).map(x=>x.trim()).filter(Boolean).join(", ")+" offered by: "+offered.join("; ");
-  return{type,subject,souls,offered,wording,amount:intentionAmount(box)};
+  return{type,subject,souls,offered,wording,schedules,amount:intentionAmount(box)}
  });
- if(!items.length||items.some(x=>!x.type||!x.offered.length||x.offered.some(v=>!v)||(x.type==="Souls"&&!x.souls)||(x.type!=="Souls"&&!x.subject))){alert("Please complete every intention and Offered by entry.");return}
- const d=new Date(date.value+"T00:00:00"),sx=mass.value==="ALL"?null:schedule[dayKey(d)].find(x=>x[0]===mass.value);
+ const min=new Date();min.setHours(0,0,0,0);min.setDate(min.getDate()+1);
+ if(!items.length||items.some(x=>!x.type||!x.offered.length||x.offered.some(v=>!v)||!x.schedules.length||x.schedules.some(v=>!v.date||!v.time||new Date(v.date+"T00:00:00")<min)||(x.type==="Souls"&&!x.souls)||(x.type!=="Souls"&&!x.subject))){
+  alert("Please complete every intention, Offered by entry, and Mass date/time. Masses must be tomorrow or a future date.");return
+ }
  const total=items.reduce((a,x)=>a+x.amount,0)+(Number(donation.value)||0),ref=newRef();
- const r={ref,parishioner:parishioner.value.trim(),address:document.getElementById("address").value.trim(),contact:contact.value.trim(),email:email.value.trim(),massDate:date.value,massTime:mass.value,massSelection:mass.value==="ALL"?"ALL":(sx?.[1]||""),massLabel:mass.value==="ALL"?"ALL MASSES":sx[1],language:mass.value==="ALL"?"Multiple":sx[2],intentions:items,donation:Number(donation.value)||0,total,gcashReference:gcashRef.value.trim(),status:"PENDING PAYMENT VERIFICATION",created:new Date().toISOString()};
+ const r={ref,parishioner:parishioner.value.trim(),address:document.getElementById("address").value.trim(),contact:contact.value.trim(),email:email.value.trim(),intentions:items,donation:Number(donation.value)||0,total,gcashReference:gcashRef.value.trim(),status:"PENDING PAYMENT VERIFICATION",created:new Date().toISOString()};
  const a=records();a.push(r);save(a);showReceipt(r);
- result.className="status";result.innerHTML="<b>Request submitted successfully.</b><br>Reference: <b>"+ref+"</b><br>Mass date: "+r.massDate+" • "+r.massLabel+"<br>Total amount to pay: <b>₱"+total.toLocaleString("en-PH")+"</b><br>Status: <b>"+r.status+"</b><br><br>Keep your reference number for status checking.";
- e.target.reset();document.getElementById("intentions").innerHTML="";id=0;addIntention();mass.innerHTML='<option value="">Select Mass date first</option>';date.min=iso(minimumDate);updateTotal();
+ result.className="status";result.innerHTML="<b>Request submitted successfully.</b><br>Reference: <b>"+ref+"</b><br>Total amount to pay: <b>₱"+total.toLocaleString("en-PH")+"</b><br>Status: <b>"+r.status+"</b><br><br>Keep your reference number for status checking.";
+ e.target.reset();document.getElementById("intentions").innerHTML="";id=0;addIntention();updateTotal();
 });
 function checkStatus(){
  const q=document.getElementById("ref").value.trim().toUpperCase(),r=records().find(x=>x.ref===q);
- status.innerHTML=r?'<div class="status"><b>'+r.ref+'</b><br>Status: <b>'+r.status+'</b><br>Mass Date: '+r.massDate+' • '+r.massLabel+'<br>Total amount to pay: <b>₱'+r.total.toLocaleString("en-PH")+'</b></div>':'<div class="notice" style="margin-top:14px">No request found. Please check your reference number.</div>';
+ status.innerHTML=r?'<div class="status"><b>'+r.ref+'</b><br>Status: <b>'+r.status+'</b><br>Total amount to pay: <b>₱'+r.total.toLocaleString("en-PH")+'</b><hr>'+r.intentions.map(x=>'<b>'+x.wording+'</b><br>'+x.schedules.map(v=>v.date+" • "+v.timeLabel+" • "+v.language).join("<br>")).join("<br><br>")+'</div>':'<div class="notice" style="margin-top:14px">No request found. Please check your reference number.</div>';
 }
 </script>
 </body></html>
