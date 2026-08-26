@@ -20,7 +20,7 @@ section{padding-top:38px}.title{margin-bottom:15px}.title h3{font:29px Georgia;c
 .payment{margin-top:15px;padding:18px;border:1px dashed #c9a34a;border-radius:13px;background:#fffaf0}.gcash{font-size:25px;font-weight:900;color:#162e70}.submit{width:100%;margin-top:17px;font-size:17px}
 .status{margin-top:15px;padding:14px;background:#edf7f0;border:1px solid #cde5d4;border-radius:11px;color:#23543e}.hidden{display:none}
 footer{background:var(--deep);color:#eadfca;padding:28px 16px}.foot{max-width:1120px;margin:auto;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}.foot h4{font:20px Georgia;color:#f0d37d;margin:0 0 7px}.foot p{font-size:13px;margin:4px 0}
-@media(max-width:720px){.quick,.grid{grid-template-columns:1fr}.full{grid-column:auto}.head{align-items:flex-start;flex-direction:column}.offeredRow{grid-template-columns:1fr}.heroContent{padding-top:40px}.top{font-size:9px}}
+@media(max-width:720px){.logoHeader img{width:185px;height:125px}.receiptLogos img{width:125px;height:80px}.quick,.grid{grid-template-columns:1fr}.full{grid-column:auto}.head{align-items:flex-start;flex-direction:column}.offeredRow{grid-template-columns:1fr}.heroContent{padding-top:40px}.top{font-size:9px}}
 
 .receipt{background:#fff;color:#222;max-width:760px;margin:22px auto 0;border:1px solid #ccc;padding:34px 38px;font-family:Georgia,"Times New Roman",serif}
 .receiptHead{text-align:center;border-bottom:2px solid #222;padding-bottom:12px;margin-bottom:20px}
@@ -42,18 +42,18 @@ footer{background:var(--deep);color:#eadfca;padding:28px 16px}.foot{max-width:11
 }
 
 .logoHeader{display:flex;justify-content:center;align-items:center;gap:18px;margin-bottom:18px}
-.logoHeader img{width:82px;height:82px;object-fit:contain;filter:drop-shadow(0 3px 5px #0005)}
+.logoHeader img{width:210px;height:145px;object-fit:contain;filter:drop-shadow(0 3px 5px #0005)}
 .parishSeal{width:82px;height:82px;border:3px solid #ead49a;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;position:relative;color:#701722;box-shadow:0 3px 8px #0005}
 .parishSeal .cross{font-size:40px;line-height:1;font-family:Georgia}.parishSeal .sealText{position:absolute;inset:7px;border:1px solid #c9a34a;border-radius:50%;font:700 7px Arial;letter-spacing:.08em;display:flex;align-items:flex-start;justify-content:center;padding-top:5px}
-.receiptLogos{display:flex;justify-content:center;align-items:center;gap:15px;margin-bottom:8px}.receiptLogos img{width:55px;height:55px;object-fit:contain}.receiptSeal{width:55px;height:55px;border:2px solid #701722;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#701722;font:25px Georgia;position:relative}.receiptSeal:after{content:"SSP";position:absolute;bottom:5px;font:700 7px Arial}
+.receiptLogos{display:flex;justify-content:center;align-items:center;gap:15px;margin-bottom:8px}.receiptLogos img{width:150px;height:95px;object-fit:contain}.receiptSeal{width:55px;height:55px;border:2px solid #701722;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#701722;font:25px Georgia;position:relative}.receiptSeal:after{content:"SSP";position:absolute;bottom:5px;font:700 7px Arial}
 
 .parishLogoImg{display:block;width:310px;max-width:72vw;height:auto;object-fit:contain;margin:0 auto 14px;border-radius:8px}
 .receiptCombinedLogo{display:block;width:230px;max-width:80%;height:auto;object-fit:contain;margin:0 auto 9px}
-@media(max-width:720px){.parishLogoImg{width:250px}.receiptCombinedLogo{width:190px}}
+@media(max-width:720px){.logoHeader img{width:185px;height:125px}.receiptLogos img{width:125px;height:80px}.parishLogoImg{width:250px}.receiptCombinedLogo{width:190px}}
 </style>
 </head>
 <body>
-<div class="top">ST. STEPHEN THE PROTOMARTYR PARISH • LIGAO CITY, ALBAY • MASS INTENTIONS v13</div>
+<div class="top">ST. STEPHEN THE PROTOMARTYR PARISH • LIGAO CITY, ALBAY • MASS INTENTIONS v15</div>
 <header><div class="hero">
 <div class="logoHeader">
 <img class="parishLogoImg" src="sspp_logo.jpg" alt="Diocese of Legazpi and St. Stephen the Protomartyr Parish Ligao City logos">
@@ -194,8 +194,11 @@ function loadIntentionMasses(d,s){
  s.innerHTML='<option value="">Select Mass</option>';
  const val=d.value;if(!val)return;
  const selected=new Date(val+"T00:00:00"),min=new Date();min.setHours(0,0,0,0);min.setDate(min.getDate()+1);
- if(selected<min){s.innerHTML='<option value="">Date unavailable</option>';return}
- (schedule[dayKey(selected)]||[]).forEach(x=>{let o=document.createElement("option");o.value=x[0];o.textContent=x[1]+" • "+x[2];s.appendChild(o)});
+ const selectedKey=val; const minKey=iso(min);
+ if(selectedKey<minKey){s.innerHTML='<option value="">Date unavailable</option>';updateTotal();return}
+ const list=schedule[dayKey(selected)]||[];
+ list.forEach(x=>{let o=document.createElement("option");o.value=x[0];o.textContent=x[1]+" • "+x[2];s.appendChild(o)});
+ if(list.length) s.value=list[0][0];
  updateTotal();
 }
 function removeIntention(btn){btn.closest(".intention").remove();updateTotal()}
@@ -235,37 +238,66 @@ document.getElementById("form").addEventListener("submit",e=>{
  e.preventDefault();
  const boxes=[...document.querySelectorAll(".intention")];
  if(!boxes.length){alert("Please add at least one Mass intention.");return}
+
  const min=new Date();min.setHours(0,0,0,0);min.setDate(min.getDate()+1);
- const items=boxes.map(box=>{
+ const minKey=iso(min);
+
+ const items=boxes.map((box,index)=>{
   const type=box.querySelector(".itype")?.value||"";
   const subject=box.querySelector(".subject")?.value.trim()||"";
   const souls=box.querySelector(".souls")?.value.trim()||"";
   const offered=[...box.querySelectorAll(".offered")].map(x=>x.value.trim());
   const schedules=[...box.querySelectorAll(".massRow")].map(row=>{
-   const d=row.querySelector(".imassDate")?.value||"",t=row.querySelector(".imassTime")?.value||"";
-   const dt=d?new Date(d+"T00:00:00"):null,key=dt?dayKey(dt):null;
+   const d=row.querySelector(".imassDate")?.value||"";
+   const t=row.querySelector(".imassTime")?.value||"";
+   const dt=d?new Date(d+"T00:00:00"):null;
+   const key=dt?dayKey(dt):null;
    const x=(key&&schedule[key])?schedule[key].find(v=>v[0]===t):null;
    return{date:d,time:t,timeLabel:x?.[1]||"",language:x?.[2]||""};
   });
   let wording="";
-  if(type==="Thanksgiving") wording="For Thanksgiving offered by: "+offered.join("; ");
-  else if(type==="Special Intention") wording="For Special Intention "+subject+" offered by: "+offered.join("; ");
-  else if(type==="Birthday Blessing") wording="Thanksgiving and Birthday Blessing of "+subject+" offered by: "+offered.join("; ");
-  else if(type==="Fast Recovery") wording="For fast recovery of "+subject+" offered by: "+offered.join("; ");
-  else if(type==="Souls") wording="For the Soul of "+souls.split(/\n|,/).map(x=>x.trim()).filter(Boolean).join(", ")+" offered by: "+offered.join("; ");
-  return{type,subject,souls,offered,schedules,wording,amount:intentionAmount(box)};
+  if(type==="Thanksgiving")wording="For Thanksgiving offered by: "+offered.join("; ");
+  else if(type==="Special Intention")wording="For Special Intention "+subject+" offered by: "+offered.join("; ");
+  else if(type==="Birthday Blessing")wording="Thanksgiving and Birthday Blessing of "+subject+" offered by: "+offered.join("; ");
+  else if(type==="Fast Recovery")wording="For fast recovery of "+subject+" offered by: "+offered.join("; ");
+  else if(type==="Souls")wording="For the Soul of "+souls.split(/\n|,/).map(x=>x.trim()).filter(Boolean).join(", ")+" offered by: "+offered.join("; ");
+  return{index:index+1,type,subject,souls,offered,schedules,wording,amount:intentionAmount(box)};
  });
- const invalid=items.some(x=>{
-  const details=(x.type==="Souls"&&!x.souls)||(x.type!=="Souls"&&x.type!=="Thanksgiving"&&!x.subject);
-  const schedules=!x.schedules.length||x.schedules.some(v=>!v.date||!v.time||new Date(v.date+"T00:00:00")<min||!v.timeLabel);
-  return !x.type||!x.offered.length||x.offered.some(v=>!v)||details||schedules;
- });
- if(invalid){alert("Please complete the intention details, Offered by, and at least one valid Mass date/time. Thanksgiving only requires Offered by.");return}
- const total=items.reduce((a,x)=>a+x.amount,0)+(Number(document.getElementById("donation")?.value)||0),ref=newRef();
- const r={ref,parishioner:document.getElementById("parishioner").value.trim(),address:document.getElementById("address").value.trim(),contact:document.getElementById("contact").value.trim(),email:document.getElementById("email").value.trim(),intentions:items,donation:Number(document.getElementById("donation")?.value)||0,total,gcashReference:document.getElementById("gcashRef").value.trim(),status:"PENDING PAYMENT VERIFICATION",created:new Date().toISOString()};
+
+ for(const x of items){
+  if(!x.type){alert("Intention #"+x.index+": Please select an intention type.");return}
+  if(!x.offered.length||x.offered.some(v=>!v)){alert("Intention #"+x.index+": Please enter at least one Offered by name.");return}
+  if(x.type==="Souls"&&!x.souls){alert("Intention #"+x.index+": Please enter at least one soul name.");return}
+  if(x.type!=="Souls"&&x.type!=="Thanksgiving"&&!x.subject){alert("Intention #"+x.index+": Please complete the requested name/details.");return}
+  if(!x.schedules.length){alert("Intention #"+x.index+": Please add a Mass date and time.");return}
+  for(const v of x.schedules){
+   if(!v.date){alert("Intention #"+x.index+": Please choose a Mass date.");return}
+   if(v.date<minKey){alert("Intention #"+x.index+": The Mass date must be tomorrow or a future date.");return}
+   if(!v.time){alert("Intention #"+x.index+": Please choose a Mass time.");return}
+   if(!v.timeLabel){alert("Intention #"+x.index+": The selected Mass time is not valid for that date.");return}
+  }
+ }
+
+ const total=items.reduce((a,x)=>a+x.amount,0)+(Number(document.getElementById("donation")?.value)||0);
+ const ref=newRef();
+ const r={
+  ref,
+  parishioner:document.getElementById("parishioner").value.trim(),
+  address:document.getElementById("address").value.trim(),
+  contact:document.getElementById("contact").value.trim(),
+  email:document.getElementById("email").value.trim(),
+  intentions:items.map(({index,...x})=>x),
+  donation:Number(document.getElementById("donation")?.value)||0,
+  total,
+  gcashReference:document.getElementById("gcashRef").value.trim(),
+  status:"PENDING PAYMENT VERIFICATION",
+  created:new Date().toISOString()
+ };
  const a=records();a.push(r);save(a);showReceipt(r);
- const resultBox=document.getElementById("result");resultBox.className="status";resultBox.innerHTML="<b>Request submitted successfully.</b><br>Reference: <b>"+ref+"</b><br>Total amount to pay: <b>₱"+total.toLocaleString("en-PH")+"</b><br>Status: <b>"+r.status+"</b><br><br>Keep your reference number for status checking.";
- document.getElementById("form").reset();const resetDonation=document.getElementById("donation");if(resetDonation)resetDonation.value=0;
+ const resultBox=document.getElementById("result");resultBox.className="status";
+ resultBox.innerHTML="<b>Request submitted successfully.</b><br>Reference: <b>"+ref+"</b><br>Total amount to pay: <b>₱"+total.toLocaleString("en-PH")+"</b><br>Status: <b>"+r.status+"</b><br><br>Keep your reference number for status checking.";
+ document.getElementById("form").reset();
+ const resetDonation=document.getElementById("donation");if(resetDonation)resetDonation.value=0;
  document.getElementById("intentions").innerHTML="";id=0;addIntention();updateTotal();
 });
 function checkStatus(){
