@@ -57,7 +57,7 @@ footer{background:var(--deep);color:#eadfca;padding:28px 16px}.foot{max-width:11
 
 <section id="request"><div class="title"><h3>Request a Mass Intention</h3><p>Select tomorrow's Mass, then add your intentions.</p></div>
 <div class="card">
-<div class="notice"><b>Important:</b> Mass intentions may be submitted only <b>one day before the scheduled Mass</b>. Please select the Mass date and time carefully.</div>
+<div class="notice"><b>Important:</b> Mass intentions must be submitted at least <b>one day before the scheduled Mass</b>. You may also reserve future Mass dates in advance.</div>
 <form id="form">
 <div class="grid">
 <div><label>Parishioner Name *</label><input id="parishioner" required placeholder="Full name"></div>
@@ -118,7 +118,7 @@ footer{background:var(--deep);color:#eadfca;padding:28px 16px}.foot{max-width:11
 <footer><div class="foot"><div><h4>St. Stephen the Protomartyr Parish</h4><p>San Esteban St., Guilid, Ligao City, Albay</p><p>st.stephenprotomartyrparish@gmail.com</p></div><div><h4>Mass Intentions</h4><p>Online request • One-day advance</p></div><div><h4>GCash</h4><p>0927 835 9644</p><p>Payment verification by parish staff</p></div></div></footer>
 
 <script>
-const KEY="sspp_mass_intentions_v5";
+const KEY="sspp_mass_intentions_v7";
 const RATE=100;
 const schedule={
 Mon:[["06:30","6:30 AM","English"],["17:15","5:15 PM","Bikol"]],
@@ -130,130 +130,119 @@ Sat:[["06:30","6:30 AM","English"],["17:00","5:00 PM","Anticipated Mass - Bikol"
 Sun:[["05:30","5:30 AM","Bikol"],["07:00","7:00 AM","Bikol"],["08:30","8:30 AM","English"],["10:00","10:00 AM","English"],["14:30","2:30 PM","Tagalog"],["16:00","4:00 PM","Bikol"],["17:30","5:30 PM","Bikol"]]
 };
 function dayKey(d){return["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()]}
-function tomorrow(){let d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+1);return d}
+function startOfToday(){let d=new Date();d.setHours(0,0,0,0);return d}
 function iso(d){return d.toISOString().slice(0,10)}
 const date=document.getElementById("date"),mass=document.getElementById("mass"),donation=document.getElementById("donation");
-date.min=iso(tomorrow());
+let minimumDate=startOfToday(); minimumDate.setDate(minimumDate.getDate()+1);
+date.min=iso(minimumDate);
 date.addEventListener("change",loadSchedule);
 mass.addEventListener("change",updateScheduleInfo);
 donation.addEventListener("input",updateTotal);
+
 function loadSchedule(){
-mass.innerHTML="";
-const d=new Date(date.value+"T00:00:00");
-if(d.getTime()!==tomorrow().getTime()){mass.innerHTML='<option value="">Date not available</option>';scheduleInfo.innerHTML='<div class="notice">Please select tomorrow only.</div>';return}
-schedule[dayKey(d)].forEach(x=>{let o=document.createElement("option");o.value=x[0];o.textContent=x[1]+" • "+x[2];mass.appendChild(o)});
-updateScheduleInfo()
+ mass.innerHTML="";
+ const d=new Date(date.value+"T00:00:00");
+ if(isNaN(d)||d<minimumDate){mass.innerHTML='<option value="">Date not available</option>';scheduleInfo.innerHTML='<div class="notice">Please select tomorrow or a future date. Same-day Mass intentions are not accepted.</div>';updateTotal();return}
+ const list=schedule[dayKey(d)];
+ const all=document.createElement("option"); all.value="ALL"; all.textContent="ALL MASSES ("+list.length+" Masses)"; mass.appendChild(all);
+ list.forEach(x=>{let o=document.createElement("option");o.value=x[0];o.textContent=x[1]+" • "+x[2];mass.appendChild(o)});
+ updateScheduleInfo();updateTotal();
 }
 function updateScheduleInfo(){
-if(!mass.value)return;
-const d=new Date(date.value+"T00:00:00"),x=schedule[dayKey(d)].find(v=>v[0]===mass.value);
-scheduleInfo.innerHTML='<div class="schedule"><b>Selected Mass:</b> '+x[1]+' <span class="tag">'+x[2]+'</span></div>'
+ if(!mass.value)return;
+ const d=new Date(date.value+"T00:00:00"), list=schedule[dayKey(d)];
+ if(mass.value==="ALL"){scheduleInfo.innerHTML='<div class="schedule"><b>Selected:</b> ALL MASSES <span class="tag">'+list.length+" Masses on this date</span></div>";return}
+ const x=list.find(v=>v[0]===mass.value);
+ scheduleInfo.innerHTML='<div class="schedule"><b>Selected Mass:</b> '+x[1]+' <span class="tag">'+x[2]+'</span></div>';
 }
+
 let id=0;
 function addIntention(){
-id++;
-const box=document.createElement("div");box.className="intention";box.dataset.id=id;
-box.innerHTML='<div class="intentionHead"><b>Intention #'+id+'</b><button type="button" class="remove" onclick="removeIntention(this)">Remove</button></div>'+
-'<label>Intention Type *</label><select class="itype" required><option value="">Select type</option><option value="Thanksgiving">For Thanksgiving</option><option value="Special Intention">For Special Intention</option><option value="Birthday Blessing">Thanksgiving and Birthday Blessing</option><option value="Fast Recovery">For fast recovery</option><option value="Souls">For the Soul</option></select>'+
-'<div class="dynamic"></div>';
-document.getElementById("intentions").appendChild(box);
-box.querySelector(".itype").addEventListener("change",()=>renderIntention(box));
-renderIntention(box);
+ id++;
+ const box=document.createElement("div");box.className="intention";box.dataset.id=id;
+ box.innerHTML='<div class="intentionHead"><b>Intention #'+id+'</b><button type="button" class="remove" onclick="removeIntention(this)">Remove</button></div>'+
+ '<label>Intention Type *</label><select class="itype" required><option value="">Select type</option><option value="Thanksgiving">For Thanksgiving</option><option value="Special Intention">For Special Intention</option><option value="Birthday Blessing">Thanksgiving and Birthday Blessing</option><option value="Fast Recovery">For fast recovery</option><option value="Souls">For the Soul</option></select>'+
+ '<div class="dynamic"></div>';
+ document.getElementById("intentions").appendChild(box);
+ box.querySelector(".itype").addEventListener("change",()=>renderIntention(box));
+ renderIntention(box);
 }
 function renderIntention(box){
-const type=box.querySelector(".itype").value, d=box.querySelector(".dynamic");
-let s="";
-if(type==="Thanksgiving")s='<label>For Thanksgiving</label><div class="offeredList"></div><button type="button" class="addOffered mini" onclick="addOffered(this)">+ Add Offered by</button>';
-if(type==="Special Intention")s='<label>For Special Intention *</label><input class="subject" required placeholder="Enter special intention"><label>Offered by</label><div class="offeredList"></div><button type="button" class="addOffered mini" onclick="addOffered(this)">+ Add Offered by</button>';
-if(type==="Birthday Blessing")s='<label>Thanksgiving and Birthday Blessing of *</label><input class="subject" required placeholder="Name"><label>Offered by</label><div class="offeredList"></div><button type="button" class="addOffered mini" onclick="addOffered(this)">+ Add Offered by</button>';
-if(type==="Fast Recovery")s='<label>For fast recovery of *</label><input class="subject" required placeholder="Name"><label>Offered by</label><div class="offeredList"></div><button type="button" class="addOffered mini" onclick="addOffered(this)">+ Add Offered by</button>';
-if(type==="Souls")s='<label>For the Soul of *</label><textarea class="souls" required placeholder="Enter one or more names of the deceased, one per line."></textarea><div class="small">Each soul is counted separately for the calculation.</div><label>Offered by</label><div class="offeredList"></div><button type="button" class="addOffered mini" onclick="addOffered(this)">+ Add Offered by</button>';
-d.innerHTML=s;
-if(s){addOffered(d.querySelector(".addOffered"))}
-updateTotal();
+ const type=box.querySelector(".itype").value,d=box.querySelector(".dynamic");let s="";
+ if(type==="Thanksgiving")s='<label>For Thanksgiving</label><div class="offeredList"></div><button type="button" class="addOffered mini" onclick="addOffered(this)">+ Add Offered by</button>';
+ if(type==="Special Intention")s='<label>For Special Intention *</label><input class="subject" required placeholder="Enter special intention"><label>Offered by</label><div class="offeredList"></div><button type="button" class="addOffered mini" onclick="addOffered(this)">+ Add Offered by</button>';
+ if(type==="Birthday Blessing")s='<label>Thanksgiving and Birthday Blessing of *</label><input class="subject" required placeholder="Name"><label>Offered by</label><div class="offeredList"></div><button type="button" class="addOffered mini" onclick="addOffered(this)">+ Add Offered by</button>';
+ if(type==="Fast Recovery")s='<label>For fast recovery of *</label><input class="subject" required placeholder="Name"><label>Offered by</label><div class="offeredList"></div><button type="button" class="addOffered mini" onclick="addOffered(this)">+ Add Offered by</button>';
+ if(type==="Souls")s='<label>For the Soul of *</label><textarea class="souls" required placeholder="Enter one or more names of the deceased, one per line."></textarea><div class="small">Each name is counted as one soul.</div><label>Offered by</label><div class="offeredList"></div><button type="button" class="addOffered mini" onclick="addOffered(this)">+ Add Offered by</button>';
+ d.innerHTML=s;
+ if(s)addOffered(d.querySelector(".addOffered"));
+ updateTotal();
 }
 function addOffered(btn){
-const box=btn.closest(".intention"),list=box.querySelector(".offeredList"),row=document.createElement("div");
-row.className="offeredRow";row.innerHTML='<input class="offered" required placeholder="Name to appear"><button type="button" class="remove mini" onclick="this.parentElement.remove();updateTotal()">Remove</button>';
-list.appendChild(row);updateTotal();
+ const box=btn.closest(".intention"),list=box.querySelector(".offeredList"),row=document.createElement("div");
+ row.className="offeredRow";row.innerHTML='<input class="offered" required placeholder="Name to appear"><button type="button" class="remove mini" onclick="this.parentElement.remove();updateTotal()">Remove</button>';
+ list.appendChild(row);updateTotal();
 }
 function removeIntention(btn){btn.closest(".intention").remove();updateTotal()}
 function soulsCount(text){return text.split(/\n|,/).map(x=>x.trim()).filter(Boolean).length}
+function massCount(){if(!mass.value)return 0;if(mass.value==="ALL"){const d=new Date(date.value+"T00:00:00");return schedule[dayKey(d)]?.length||0}return 1}
 function intentionAmount(box){
-const type=box.querySelector(".itype").value, offered=box.querySelectorAll(".offered").length;
-if(!type)return 0;
-if(type==="Souls"){const n=soulsCount(box.querySelector(".souls")?.value||"");return n*RATE + Math.max(0,offered-1)*RATE}
-return RATE + Math.max(0,offered-1)*RATE
+ const type=box.querySelector(".itype").value,offered=box.querySelectorAll(".offered").length,masses=massCount();
+ if(!type||!masses)return 0;
+ const chargeable=type==="Souls"?soulsCount(box.querySelector(".souls")?.value||""):1;
+ return (chargeable + Math.max(0,offered-1))*RATE*masses;
 }
 function updateTotal(){
-let total=0;
-document.querySelectorAll(".intention").forEach(x=>{total+=intentionAmount(x)});
-total+=Math.max(0,Number(donation.value)||0);
-document.getElementById("total").textContent="₱"+total.toLocaleString("en-PH");
+ let total=0;document.querySelectorAll(".intention").forEach(x=>total+=intentionAmount(x));
+ total+=Math.max(0,Number(donation.value)||0);
+ document.getElementById("total").textContent="₱"+total.toLocaleString("en-PH");
 }
 document.getElementById("intentions").addEventListener("input",updateTotal);
 addIntention();
 
-
 const ones=["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
 const tens=["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
-function wordsUnder1000(n){
- n=Math.floor(n);let s="";
- if(n>=100){s+=ones[Math.floor(n/100)]+" Hundred";n%=100;if(n)s+=" ";}
- if(n>=20){s+=tens[Math.floor(n/10)];n%=10;if(n)s+="-"+ones[n];}
- else if(n>0)s+=ones[n];
- return s;
-}
-function amountWords(n){
- n=Math.round(Number(n)||0);
- if(n===0)return"Zero Pesos";
- let s="";
- if(n>=1000000){s+=wordsUnder1000(Math.floor(n/1000000))+" Million ";n%=1000000}
- if(n>=1000){s+=wordsUnder1000(Math.floor(n/1000))+" Thousand ";n%=1000}
- if(n>0)s+=wordsUnder1000(n)+" ";
- return s.trim()+" Pesos";
-}
+function wordsUnder1000(n){n=Math.floor(n);let s="";if(n>=100){s+=ones[Math.floor(n/100)]+" Hundred";n%=100;if(n)s+=" "}if(n>=20){s+=tens[Math.floor(n/10)];n%=10;if(n)s+="-"+ones[n]}else if(n>0)s+=ones[n];return s}
+function amountWords(n){n=Math.round(Number(n)||0);if(n===0)return"Zero Pesos";let s="";if(n>=1000000){s+=wordsUnder1000(Math.floor(n/1000000))+" Million ";n%=1000000}if(n>=1000){s+=wordsUnder1000(Math.floor(n/1000))+" Thousand ";n%=1000}if(n>0)s+=wordsUnder1000(n)+" ";return s.trim()+" Pesos"}
 function showReceipt(r){
  document.getElementById("receiptPrint").classList.remove("hidden");
- document.getElementById("rcptName").textContent=r.parishioner;
- document.getElementById("rcptAddress").textContent=r.address||"";
- document.getElementById("rcptContact").textContent=r.contact||"";
- document.getElementById("rcptWords").textContent=amountWords(r.total);
- document.getElementById("rcptFigures").textContent="₱"+Number(r.total).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2});
- document.getElementById("rcptTotal").textContent="₱"+Number(r.total).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2});
- document.getElementById("rcptIntentions").innerHTML=r.intentions.map(x=>"• "+x.wording).join("<br>")+(r.donation>0?("<br>• Donation"): "");
- document.getElementById("rcptRef").textContent=r.ref;
- document.getElementById("rcptStatus").textContent=r.status;
+ document.getElementById("rcptName").textContent=r.parishioner;document.getElementById("rcptAddress").textContent=r.address||"";document.getElementById("rcptContact").textContent=r.contact||"";
+ document.getElementById("rcptWords").textContent=amountWords(r.total);document.getElementById("rcptFigures").textContent="₱"+Number(r.total).toLocaleString("en-PH",{minimumFractionDigits:2});
+ document.getElementById("rcptTotal").textContent="₱"+Number(r.total).toLocaleString("en-PH",{minimumFractionDigits:2});
+ document.getElementById("rcptIntentions").innerHTML=r.intentions.map(x=>"• "+x.wording+" <span style='font-size:11px'>(applies to "+(r.massSelection==="ALL"?"ALL MASSES":"selected Mass")+")</span>").join("<br>")+(r.donation>0?"<br>• Donation":"");
+ document.getElementById("rcptRef").textContent=r.ref;document.getElementById("rcptStatus").textContent=r.status;
  document.getElementById("receiptPrint").scrollIntoView({behavior:"smooth"});
 }
 function records(){return JSON.parse(localStorage.getItem(KEY)||"[]")}
 function save(a){localStorage.setItem(KEY,JSON.stringify(a))}
 function newRef(){return"MI-"+new Date().getFullYear()+"-"+String(records().length+1).padStart(6,"0")}
+
 document.getElementById("form").addEventListener("submit",e=>{
-e.preventDefault();
-if(date.value!==iso(tomorrow())){alert("Mass intentions can only be submitted one day before the Mass.");return}
-const boxes=[...document.querySelectorAll(".intention")];
-const items=boxes.map(box=>{
-const type=box.querySelector(".itype").value,subject=box.querySelector(".subject")?.value.trim()||"",souls=box.querySelector(".souls")?.value.trim()||"",offered=[...box.querySelectorAll(".offered")].map(x=>x.value.trim());
-let wording="";
-if(type==="Thanksgiving")wording="For Thanksgiving offered by: "+offered.join("; ");
-if(type==="Special Intention")wording="For Special Intention "+subject+" offered by: "+offered.join("; ");
-if(type==="Birthday Blessing")wording="Thanksgiving and Birthday Blessing of "+subject+" offered by: "+offered.join("; ");
-if(type==="Fast Recovery")wording="For fast recovery of "+subject+" offered by: "+offered.join("; ");
-if(type==="Souls")wording="For the Soul of "+souls.split(/\n|,/).map(x=>x.trim()).filter(Boolean).join(", ")+" offered by: "+offered.join("; ");
-return{type,subject,souls,offered,wording,amount:intentionAmount(box)}
-});
-if(!items.length||items.some(x=>!x.type||!x.offered.length||x.offered.some(v=>!v)||(x.type==="Souls"&&!x.souls)||(x.type!=="Souls"&&!x.subject))){alert("Please complete every intention and Offered by entry.");return}
-const d=new Date(date.value+"T00:00:00"),sx=schedule[dayKey(d)].find(x=>x[0]===mass.value);
-const total=items.reduce((a,x)=>a+x.amount,0)+(Number(donation.value)||0),ref=newRef();
-const r={ref,parishioner:parishioner.value.trim(),address:document.getElementById("address").value.trim(),contact:contact.value.trim(),email:email.value.trim(),massDate:date.value,massTime:mass.value,massLabel:sx[1],language:sx[2],intentions:items,donation:Number(donation.value)||0,total,gcashReference:gcashRef.value.trim(),status:"PENDING PAYMENT VERIFICATION",created:new Date().toISOString()};
-const a=records();a.push(r);save(a);showReceipt(r);
-result.className="status";result.innerHTML="<b>Request submitted successfully.</b><br>Reference: <b>"+ref+"</b><br>Mass: "+r.massDate+" • "+r.massLabel+" • "+r.language+"<br>Total amount to pay: <b>₱"+total.toLocaleString("en-PH")+"</b><br>Status: <b>"+r.status+"</b><br><br>Keep your reference number for status checking.";
-e.target.reset();document.getElementById("intentions").innerHTML="";id=0;addIntention();mass.innerHTML='<option value="">Select Mass date first</option>';date.min=iso(tomorrow());updateTotal();
+ e.preventDefault();
+ if(!date.value||new Date(date.value+"T00:00:00")<minimumDate){alert("Mass intentions must be submitted at least one day before the Mass.");return}
+ if(!mass.value){alert("Please select a Mass.");return}
+ const boxes=[...document.querySelectorAll(".intention")];
+ const items=boxes.map(box=>{
+  const type=box.querySelector(".itype").value,subject=box.querySelector(".subject")?.value.trim()||"",souls=box.querySelector(".souls")?.value.trim()||"",offered=[...box.querySelectorAll(".offered")].map(x=>x.value.trim());
+  let wording="";
+  if(type==="Thanksgiving")wording="For Thanksgiving offered by: "+offered.join("; ");
+  if(type==="Special Intention")wording="For Special Intention "+subject+" offered by: "+offered.join("; ");
+  if(type==="Birthday Blessing")wording="Thanksgiving and Birthday Blessing of "+subject+" offered by: "+offered.join("; ");
+  if(type==="Fast Recovery")wording="For fast recovery of "+subject+" offered by: "+offered.join("; ");
+  if(type==="Souls")wording="For the Soul of "+souls.split(/\n|,/).map(x=>x.trim()).filter(Boolean).join(", ")+" offered by: "+offered.join("; ");
+  return{type,subject,souls,offered,wording,amount:intentionAmount(box)};
+ });
+ if(!items.length||items.some(x=>!x.type||!x.offered.length||x.offered.some(v=>!v)||(x.type==="Souls"&&!x.souls)||(x.type!=="Souls"&&!x.subject))){alert("Please complete every intention and Offered by entry.");return}
+ const d=new Date(date.value+"T00:00:00"),sx=mass.value==="ALL"?null:schedule[dayKey(d)].find(x=>x[0]===mass.value);
+ const total=items.reduce((a,x)=>a+x.amount,0)+(Number(donation.value)||0),ref=newRef();
+ const r={ref,parishioner:parishioner.value.trim(),address:document.getElementById("address").value.trim(),contact:contact.value.trim(),email:email.value.trim(),massDate:date.value,massTime:mass.value,massSelection:mass.value==="ALL"?"ALL":(sx?.[1]||""),massLabel:mass.value==="ALL"?"ALL MASSES":sx[1],language:mass.value==="ALL"?"Multiple":sx[2],intentions:items,donation:Number(donation.value)||0,total,gcashReference:gcashRef.value.trim(),status:"PENDING PAYMENT VERIFICATION",created:new Date().toISOString()};
+ const a=records();a.push(r);save(a);showReceipt(r);
+ result.className="status";result.innerHTML="<b>Request submitted successfully.</b><br>Reference: <b>"+ref+"</b><br>Mass date: "+r.massDate+" • "+r.massLabel+"<br>Total amount to pay: <b>₱"+total.toLocaleString("en-PH")+"</b><br>Status: <b>"+r.status+"</b><br><br>Keep your reference number for status checking.";
+ e.target.reset();document.getElementById("intentions").innerHTML="";id=0;addIntention();mass.innerHTML='<option value="">Select Mass date first</option>';date.min=iso(minimumDate);updateTotal();
 });
 function checkStatus(){
-const q=document.getElementById("ref").value.trim().toUpperCase(),r=records().find(x=>x.ref===q);
-status.innerHTML=r?'<div class="status"><b>'+r.ref+'</b><br>Status: <b>'+r.status+'</b><br>Mass: '+r.massDate+' • '+r.massLabel+' • '+r.language+'<br>Total amount to pay: <b>₱'+r.total.toLocaleString("en-PH")+'</b></div>':'<div class="notice" style="margin-top:14px">No request found. Please check your reference number.</div>';
+ const q=document.getElementById("ref").value.trim().toUpperCase(),r=records().find(x=>x.ref===q);
+ status.innerHTML=r?'<div class="status"><b>'+r.ref+'</b><br>Status: <b>'+r.status+'</b><br>Mass Date: '+r.massDate+' • '+r.massLabel+'<br>Total amount to pay: <b>₱'+r.total.toLocaleString("en-PH")+'</b></div>':'<div class="notice" style="margin-top:14px">No request found. Please check your reference number.</div>';
 }
 </script>
 </body></html>
