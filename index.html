@@ -1,152 +1,259 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#701722">
 <title>St. Stephen the Protomartyr Parish | Mass Intentions</title>
 <style>
-:root{--wine:#701722;--deep:#450c14;--gold:#c9a34a;--cream:#fbf8f1;--paper:#fffdf8;--ink:#29231f;--muted:#746b64;--line:#e5dccf;--ok:#236b4b}
+:root{--wine:#701722;--deep:#450c14;--gold:#c9a34a;--cream:#fbf8f1;--paper:#fffdf8;--ink:#29231f;--muted:#746b64;--line:#e5dccf}
 *{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif}
 .top{background:var(--deep);color:#f1dda5;text-align:center;padding:7px;font-size:11px;letter-spacing:.13em}
-header{background:linear-gradient(120deg,#450c14f2,#701722e8),url('https://ligaocity.albay.gov.ph/wp-content/uploads/2017/03/church.png') center/cover;color:#fff}
-.hero{max-width:1120px;margin:auto;padding:20px 16px 45px}.brand{display:flex;align-items:center;gap:12px}.seal{width:56px;height:56px;border:2px solid #ead49a;border-radius:50%;display:grid;place-items:center;color:#f1d47c;font:30px Georgia}.brand h1{font:18px Georgia;margin:0}.brand small{color:#e9d9b7}
-.heroContent{max-width:760px;padding-top:55px}.kicker{color:#f0d37d;font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}.hero h2{font:clamp(38px,7vw,70px)/.98 Georgia;margin:12px 0}.hero p{font-size:17px;line-height:1.6;color:#f9efe3}.btn{border:0;border-radius:11px;padding:13px 18px;font-weight:800;cursor:pointer}.gold{background:var(--gold);color:#321b0c}.wine{background:var(--wine);color:white}.ghost{background:#ffffff16;border:1px solid #ffffff45;color:white}
+header{background:linear-gradient(120deg,#450c14f4,#701722e9),url('https://ligaocity.albay.gov.ph/wp-content/uploads/2017/03/church.png') center/cover;color:#fff}
+.hero{max-width:1120px;margin:auto;padding:20px 16px 48px}.brand{display:flex;align-items:center;gap:12px}.seal{width:56px;height:56px;border:2px solid #ead49a;border-radius:50%;display:grid;place-items:center;color:#f1d47c;font:30px Georgia}.brand h1{font:18px Georgia;margin:0}.brand small{color:#e9d9b7}
+.heroContent{max-width:760px;padding-top:52px}.kicker{color:#f0d37d;font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}.hero h2{font:clamp(38px,7vw,70px)/.98 Georgia;margin:12px 0}.hero p{font-size:17px;line-height:1.6;color:#f9efe3}.btn{border:0;border-radius:11px;padding:13px 18px;font-weight:800;cursor:pointer}.gold{background:var(--gold);color:#321b0c}.wine{background:var(--wine);color:white}
 main{max-width:1120px;margin:auto;padding:0 15px 50px}.quick{margin-top:-22px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;position:relative}.tile,.card{background:var(--paper);border:1px solid var(--line);border-radius:17px;padding:20px;box-shadow:0 10px 28px #38250f0d}.tile b{display:block;color:var(--wine);margin-bottom:4px}.small{font-size:12px;color:var(--muted);line-height:1.5}
 section{padding-top:38px}.title{margin-bottom:15px}.title h3{font:29px Georgia;color:var(--wine);margin:0}.title p{color:var(--muted);margin:5px 0 0}
 .notice{padding:14px;border-left:4px solid var(--gold);background:#fff8df;border-radius:11px;line-height:1.5;font-size:14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}label{font-weight:800;font-size:13px;display:block;margin:15px 0 6px}input,select,textarea{width:100%;padding:13px;border:1px solid #d7cdbf;border-radius:10px;background:white;font:inherit}textarea{min-height:92px;resize:vertical}.full{grid-column:1/-1}
-.scheduleInfo{background:#f7f0e0;border:1px solid #e3d3ad;border-radius:13px;padding:15px;margin-top:14px}.scheduleInfo b{color:var(--wine)}.language{display:inline-block;padding:4px 7px;border-radius:99px;background:#eee5d4;margin-left:5px;font-size:11px}
-.intentions{margin-top:20px}.intentionsHeader{display:flex;align-items:center;justify-content:space-between;gap:10px}.intentionsHeader h4{margin:0;color:var(--wine);font:22px Georgia}.intention{border:1px solid var(--line);border-radius:13px;padding:15px;margin-top:12px;background:#fff}.intentionHead{display:flex;justify-content:space-between;gap:10px;align-items:center}.remove{background:#f5e7e7;color:#8b1d2a;border:0;border-radius:8px;padding:7px 10px;font-weight:700}.fee{font-weight:900;color:var(--wine);white-space:nowrap}.summary{margin-top:18px;background:linear-gradient(135deg,#fffdf6,#f6efdc);border:1px solid #dfcd9f;border-radius:14px;padding:17px}.summaryLine{display:flex;justify-content:space-between;gap:10px}.total{font:32px Georgia;color:var(--wine);font-weight:800}.payment{margin-top:15px;padding:18px;border:1px dashed #c9a34a;border-radius:13px;background:#fffaf0}.gcash{font-size:25px;font-weight:900;color:#162e70}.submit{width:100%;margin-top:17px;font-size:17px}.status{margin-top:15px;padding:14px;background:#edf7f0;border:1px solid #cde5d4;border-radius:11px;color:#23543e}.hidden{display:none}
+.schedule{background:#f7f0e0;border:1px solid #e3d3ad;border-radius:13px;padding:15px;margin-top:10px}.schedule b{color:var(--wine)}.tag{display:inline-block;padding:3px 7px;border-radius:99px;background:#eee5d4;margin-left:5px;font-size:11px}
+.intentions{margin-top:22px}.head{display:flex;justify-content:space-between;align-items:center;gap:10px}.head h4{margin:0;color:var(--wine);font:22px Georgia}.intention{border:1px solid var(--line);border-radius:13px;padding:15px;margin-top:12px;background:#fff}.intentionHead{display:flex;justify-content:space-between;align-items:center;gap:10px}.remove{background:#f5e7e7;color:#8b1d2a;border:0;border-radius:8px;padding:7px 10px;font-weight:700}.offeredRow{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:7px}.mini{padding:9px 11px;font-size:13px}.addOffered{background:#f4ead3;color:#5b3b0f;border:0;border-radius:8px;font-weight:700}.countInfo{font-size:12px;color:var(--muted);margin-top:7px}
+.donation{margin-top:22px;padding:18px;border:1px solid var(--line);border-radius:14px;background:#fff}.totalbox{margin-top:18px;background:linear-gradient(135deg,#fffdf6,#f6efdc);border:1px solid #dfcd9f;border-radius:14px;padding:18px;text-align:center}.totalbox .label{font-size:13px;color:var(--muted);font-weight:800;letter-spacing:.08em}.total{font:40px Georgia;color:var(--wine);font-weight:800;margin-top:5px}
+.payment{margin-top:15px;padding:18px;border:1px dashed #c9a34a;border-radius:13px;background:#fffaf0}.gcash{font-size:25px;font-weight:900;color:#162e70}.submit{width:100%;margin-top:17px;font-size:17px}
+.status{margin-top:15px;padding:14px;background:#edf7f0;border:1px solid #cde5d4;border-radius:11px;color:#23543e}.hidden{display:none}
 footer{background:var(--deep);color:#eadfca;padding:28px 16px}.foot{max-width:1120px;margin:auto;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}.foot h4{font:20px Georgia;color:#f0d37d;margin:0 0 7px}.foot p{font-size:13px;margin:4px 0}
-@media(max-width:720px){.quick,.grid{grid-template-columns:1fr}.full{grid-column:auto}.heroContent{padding-top:40px}.intentionsHeader{align-items:flex-start;flex-direction:column}.intentionHead{align-items:flex-start}.top{font-size:9px}}
+@media(max-width:720px){.quick,.grid{grid-template-columns:1fr}.full{grid-column:auto}.head{align-items:flex-start;flex-direction:column}.offeredRow{grid-template-columns:1fr}.heroContent{padding-top:40px}.top{font-size:9px}}
+
+.receipt{background:#fff;color:#222;max-width:760px;margin:22px auto 0;border:1px solid #ccc;padding:34px 38px;font-family:Georgia,"Times New Roman",serif}
+.receiptHead{text-align:center;border-bottom:2px solid #222;padding-bottom:12px;margin-bottom:20px}
+.receiptHead .dio{font-size:18px;font-weight:800;letter-spacing:.04em}
+.receiptHead .parish{font-size:17px;font-weight:700;margin-top:5px}
+.receiptHead .city{font-size:14px;margin-top:3px}
+.receiptMeta{line-height:1.9;font-size:15px}
+.receiptLine{display:flex;gap:6px;flex-wrap:wrap}.receiptLabel{font-weight:700}.receiptUnderline{border-bottom:1px solid #555;min-width:220px;display:inline-block}
+.receiptAmount{text-align:center;margin:18px 0;font-size:16px}.receiptAmount .words{font-weight:700}.receiptAmount .figures{font-weight:700}
+.receiptFor{margin-top:12px;font-weight:700}.receiptIntentions{margin:8px 0 20px;padding:10px 14px;border-left:3px solid #701722;line-height:1.65;font-size:14px}
+.receiptTotal{border-top:2px solid #222;border-bottom:2px solid #222;padding:10px 0;display:flex;justify-content:space-between;font-weight:800;font-size:17px}
+.receiptThank{text-align:center;font-weight:700;margin-top:22px}.receiptRef{text-align:right;font:11px Arial;color:#666;margin-top:18px}
+.receiptActions{display:flex;gap:10px;justify-content:center;margin-top:15px}.receiptActions button{padding:10px 16px;border:0;border-radius:8px;font-weight:700;cursor:pointer}
+@media print{
+ body>*:not(#receiptPrint){display:none!important}
+ #receiptPrint{display:block!important}
+ .receipt{border:0;margin:0;max-width:none;box-shadow:none;padding:25mm 18mm}
+ .receiptActions{display:none!important}
+}
 </style>
 </head>
 <body>
 <div class="top">ST. STEPHEN THE PROTOMARTYR PARISH • LIGAO CITY, ALBAY</div>
 <header><div class="hero">
-  <div class="brand"><div class="seal">✝</div><div><h1>St. Stephen the Protomartyr Parish</h1><small>Guilid, Ligao City, Albay</small></div></div>
-  <div class="heroContent"><div class="kicker">A prayer offered in faith</div><h2>Offer a Mass Intention.</h2><p>Entrust your thanksgiving, birthday, special intention, or prayers for the souls of the faithful departed to the Holy Mass.</p><button class="btn gold" onclick="document.getElementById('request').scrollIntoView()">Request an Intention</button></div>
+<div class="brand"><div class="seal">✝</div><div><h1>St. Stephen the Protomartyr Parish</h1><small>Guilid, Ligao City, Albay</small></div></div>
+<div class="heroContent"><div class="kicker">A prayer offered in faith</div><h2>Offer a Mass Intention.</h2><p>Entrust your thanksgiving, birthday, special intention, prayers for healing, or prayers for the souls of the faithful departed to the Holy Mass.</p><button class="btn gold" onclick="document.getElementById('request').scrollIntoView()">Request an Intention</button></div>
 </div></header>
-
 <main>
 <div class="quick">
- <div class="tile"><b>₱100 per Intention</b><span class="small">Thanksgiving, Birthday, Special Intention, or Souls. Souls remain ₱100 total for all names in one intention.</span></div>
- <div class="tile"><b>Multiple Intentions</b><span class="small">Add several intentions in one request and the system automatically calculates the total.</span></div>
- <div class="tile"><b>One-Day Advance</b><span class="small">Requests can only be submitted one day before the scheduled Mass.</span></div>
+<div class="tile"><b>Mass Intentions</b><span class="small">Submit one or several intentions in a single request.</span></div>
+<div class="tile"><b>Multiple Offered By</b><span class="small">Add separate offered-by entries when an intention is offered by more than one party.</span></div>
+<div class="tile"><b>Donation</b><span class="small">You may include an optional donation with your request.</span></div>
 </div>
 
-<section id="request">
-<div class="title"><h3>Request a Mass Intention</h3><p>Select the Mass first, then add one or more intentions.</p></div>
+<section id="request"><div class="title"><h3>Request a Mass Intention</h3><p>Select tomorrow's Mass, then add your intentions.</p></div>
 <div class="card">
-<div class="notice"><b>Important:</b> Only Masses scheduled for <b>tomorrow</b> can be selected. The parish may also close a Mass when its available intention slots are full.</div>
+<div class="notice"><b>Important:</b> Mass intentions may be submitted only <b>one day before the scheduled Mass</b>. Please select the Mass date and time carefully.</div>
 <form id="form">
 <div class="grid">
 <div><label>Parishioner Name *</label><input id="parishioner" required placeholder="Full name"></div>
-<div><label>Contact Number *</label><input id="contact" required placeholder="09XXXXXXXXX"></div>
+<div><label>Contact Number *</label><input id="contact" required placeholder="09XXXXXXXXX"></div><div><label>Barangay / Address (Optional)</label><input id="address" placeholder="Optional"></div>
 <div><label>Email</label><input id="email" type="email" placeholder="Optional"></div>
 <div><label>Mass Date *</label><input id="date" type="date" required></div>
 <div class="full"><label>Mass Schedule *</label><select id="mass" required><option value="">Select Mass date first</option></select><div id="scheduleInfo"></div></div>
 </div>
 
 <div class="intentions">
-<div class="intentionsHeader"><h4>Your Intentions</h4><button type="button" class="btn gold" onclick="addIntention()">+ Add Intention</button></div>
+<div class="head"><h4>Mass Intentions</h4><button type="button" class="btn gold" onclick="addIntention()">+ Add Intention</button></div>
 <div id="intentions"></div>
 </div>
 
-<div class="summary">
-<div class="summaryLine"><span>Total Intentions</span><b id="count">0</b></div>
-<div class="summaryLine"><span>Total Parish Offering</span><span class="total" id="total">₱0</span></div>
-<div class="small">Every intention is ₱100. A single Souls / Eternal Repose intention is ₱100 total regardless of how many names are entered under it.</div>
+<div class="donation">
+<label>Donation (Optional)</label>
+<input id="donation" type="number" min="0" step="100" value="0" placeholder="Enter donation amount">
+<div class="small">A donation is separate from the Mass intention offering and will be included in the total amount to pay.</div>
 </div>
 
-<div class="payment">
-<b>GCash Payment</b>
-<p style="margin:7px 0">Send the total amount to:</p>
-<div class="gcash">0927 835 9644</div>
-<div class="small" style="margin-top:7px">The parish office will verify the payment. Never provide your GCash PIN or OTP.</div>
-<label>GCash Reference Number *</label><input id="gcashRef" required placeholder="Enter your GCash reference number">
-</div>
+<div class="totalbox"><div class="label">TOTAL AMOUNT TO PAY</div><div class="total" id="total">₱0</div></div>
 
+<div class="payment"><b>GCash Payment</b><p style="margin:7px 0">Send the total amount to:</p><div class="gcash">0927 835 9644</div><div class="small" style="margin-top:7px">The parish office will verify the payment. Never provide your GCash PIN or OTP.</div>
+<label>GCash Reference Number *</label><input id="gcashRef" required placeholder="Enter your GCash reference number"></div>
 <button type="submit" class="btn wine submit">Submit Mass Intention Request</button>
 </form>
 <div id="result" class="hidden"></div>
-</div>
-</section>
+</div></section>
 
-<section>
-<div class="title"><h3>Check Your Request</h3><p>Use your reference number to check the request status.</p></div>
-<div class="card"><div class="grid"><div><label>Reference Number</label><input id="ref" placeholder="MI-2026-000001"></div><div style="display:flex;align-items:end"><button type="button" class="btn wine" style="width:100%" onclick="checkStatus()">Check Status</button></div></div><div id="status"></div></div>
-</section>
+<section><div class="title"><h3>Check Your Request</h3><p>Use the reference number received after submission.</p></div>
+<div class="card"><div class="grid"><div><label>Reference Number</label><input id="ref" placeholder="MI-2026-000001"></div><div style="display:flex;align-items:end"><button type="button" class="btn wine" style="width:100%" onclick="checkStatus()">Check Status</button></div></div><div id="status"></div></div></section>
 </main>
 
-<footer><div class="foot"><div><h4>St. Stephen the Protomartyr Parish</h4><p>San Esteban St., Guilid, Ligao City, Albay</p><p>st.stephenprotomartyrparish@gmail.com</p></div><div><h4>Mass Intentions</h4><p>₱100 per intention</p><p>One-day advance submission</p></div><div><h4>GCash</h4><p>0927 835 9644</p><p>Manual verification in this version</p></div></div></footer>
+<div id="receiptPrint" class="receipt hidden">
+  <div class="receiptHead">
+    <div class="dio">DIOCESE OF LEGAZPI</div>
+    <div class="parish">Parish of St. Stephen the Protomartyr</div>
+    <div class="city">Ligao City</div>
+  </div>
+  <div class="receiptMeta">
+    <div class="receiptLine"><span class="receiptLabel">Received from:</span><span id="rcptName" class="receiptUnderline"></span></div>
+    <div class="receiptLine"><span class="receiptLabel">of:</span><span id="rcptAddress" class="receiptUnderline"></span> <span class="receiptLabel">CP No.:</span><span id="rcptContact" class="receiptUnderline" style="min-width:150px"></span></div>
+  </div>
+  <div class="receiptAmount">
+    <div>the amount of <span id="rcptWords" class="words"></span></div>
+    <div>(<span id="rcptFigures" class="figures"></span>)</div>
+  </div>
+  <div class="receiptFor">for</div>
+  <div id="rcptIntentions" class="receiptIntentions"></div>
+  <div class="receiptTotal"><span>Total:</span><span id="rcptTotal"></span></div>
+  <div class="receiptThank">Thank You!</div>
+  <div class="receiptRef">Receipt No.: <span id="rcptRef"></span><br>Payment Status: <span id="rcptStatus"></span></div>
+  <div class="receiptActions">
+    <button class="wine" onclick="window.print()">Print Receipt</button>
+    <button onclick="document.getElementById('receiptPrint').classList.add('hidden')">Close</button>
+  </div>
+</div>
+<footer><div class="foot"><div><h4>St. Stephen the Protomartyr Parish</h4><p>San Esteban St., Guilid, Ligao City, Albay</p><p>st.stephenprotomartyrparish@gmail.com</p></div><div><h4>Mass Intentions</h4><p>Online request • One-day advance</p></div><div><h4>GCash</h4><p>0927 835 9644</p><p>Payment verification by parish staff</p></div></div></footer>
 
 <script>
-const KEY="sspp_mass_intentions_v3";
+const KEY="sspp_mass_intentions_v5";
+const RATE=100;
 const schedule={
-  "Mon":[["06:30","6:30 AM","English"],["17:15","5:15 PM","Bikol"]],
-  "Tue":[["06:30","6:30 AM","English"],["17:15","5:15 PM","Bikol"]],
-  "Wed":[["06:30","6:30 AM","Bikol"],["17:15","5:15 PM","English"]],
-  "Thu":[["06:30","6:30 AM","English"],["17:00","5:00 PM","Anticipated Mass - Bikol"]],
-  "Fri":[["06:30","6:30 AM","English"],["17:00","5:00 PM","Anticipated Mass - Bikol"]],
-  "Sat":[["06:30","6:30 AM","English"],["17:00","5:00 PM","Anticipated Mass - Bikol"]],
-  "Sun":[["05:30","5:30 AM","Bikol"],["07:00","7:00 AM","Bikol"],["08:30","8:30 AM","English"],["10:00","10:00 AM","English"],["14:30","2:30 PM","Tagalog"],["16:00","4:00 PM","Bikol"],["17:30","5:30 PM","Bikol"]]
+Mon:[["06:30","6:30 AM","English"],["17:15","5:15 PM","Bikol"]],
+Tue:[["06:30","6:30 AM","English"],["17:15","5:15 PM","Bikol"]],
+Wed:[["06:30","6:30 AM","Bikol"],["17:15","5:15 PM","English"]],
+Thu:[["06:30","6:30 AM","English"],["17:15","5:15 PM","Bikol"]],
+Fri:[["06:30","6:30 AM","English"],["17:15","5:15 PM","Bikol"]],
+Sat:[["06:30","6:30 AM","English"],["17:00","5:00 PM","Anticipated Mass - Bikol"]],
+Sun:[["05:30","5:30 AM","Bikol"],["07:00","7:00 AM","Bikol"],["08:30","8:30 AM","English"],["10:00","10:00 AM","English"],["14:30","2:30 PM","Tagalog"],["16:00","4:00 PM","Bikol"],["17:30","5:30 PM","Bikol"]]
 };
-function dayKey(d){return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()]}
+function dayKey(d){return["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()]}
 function tomorrow(){let d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+1);return d}
 function iso(d){return d.toISOString().slice(0,10)}
-const date=document.getElementById("date"),mass=document.getElementById("mass");
+const date=document.getElementById("date"),mass=document.getElementById("mass"),donation=document.getElementById("donation");
 date.min=iso(tomorrow());
 date.addEventListener("change",loadSchedule);
+mass.addEventListener("change",updateScheduleInfo);
+donation.addEventListener("input",updateTotal);
 function loadSchedule(){
- mass.innerHTML="";
- const d=new Date(date.value+"T00:00:00"), t=tomorrow();
- if(d.getTime()!==t.getTime()){
-  mass.innerHTML='<option value="">Date not available</option>';
-  document.getElementById("scheduleInfo").innerHTML='<div class="notice">Please select tomorrow only. Same-day Mass intention requests are not accepted.</div>';return;
- }
- const key=dayKey(d);
- schedule[key].forEach(x=>{let o=document.createElement("option");o.value=x[0];o.textContent=x[1]+" • "+x[2];mass.appendChild(o)});
- updateInfo();
+mass.innerHTML="";
+const d=new Date(date.value+"T00:00:00");
+if(d.getTime()!==tomorrow().getTime()){mass.innerHTML='<option value="">Date not available</option>';scheduleInfo.innerHTML='<div class="notice">Please select tomorrow only.</div>';return}
+schedule[dayKey(d)].forEach(x=>{let o=document.createElement("option");o.value=x[0];o.textContent=x[1]+" • "+x[2];mass.appendChild(o)});
+updateScheduleInfo()
 }
-mass.addEventListener("change",updateInfo);
-function updateInfo(){
- if(!mass.value)return;
- const d=new Date(date.value+"T00:00:00"), x=schedule[dayKey(d)].find(v=>v[0]===mass.value);
- document.getElementById("scheduleInfo").innerHTML='<div class="scheduleInfo"><b>Selected Mass:</b> '+x[1]+' <span class="language">'+x[2]+'</span></div>';
+function updateScheduleInfo(){
+if(!mass.value)return;
+const d=new Date(date.value+"T00:00:00"),x=schedule[dayKey(d)].find(v=>v[0]===mass.value);
+scheduleInfo.innerHTML='<div class="schedule"><b>Selected Mass:</b> '+x[1]+' <span class="tag">'+x[2]+'</span></div>'
 }
 let id=0;
 function addIntention(){
- id++;
- const box=document.createElement("div");box.className="intention";box.dataset.id=id;
- box.innerHTML='<div class="intentionHead"><b>Intention #'+id+'</b><span class="fee">₱100</span></div>'+
- '<label>Intention Type *</label><select class="itype" required><option value="">Select type</option><option>Thanksgiving</option><option>Birthday</option><option>Special Intention</option><option>Souls / Eternal Repose</option></select>'+
- '<label>Offered by *</label><input class="offered" required placeholder="Name to appear in the Mass intention list">'+
- '<label>Name(s) / Intention *</label><textarea class="inames" required placeholder="For Souls, enter all names here. One Souls intention remains ₱100 total."></textarea>'+
- '<button type="button" class="remove" onclick="removeIntention(this)">Remove</button>';
- document.getElementById("intentions").appendChild(box);updateTotal();
+id++;
+const box=document.createElement("div");box.className="intention";box.dataset.id=id;
+box.innerHTML='<div class="intentionHead"><b>Intention #'+id+'</b><button type="button" class="remove" onclick="removeIntention(this)">Remove</button></div>'+
+'<label>Intention Type *</label><select class="itype" required><option value="">Select type</option><option value="Thanksgiving">For Thanksgiving</option><option value="Special Intention">For Special Intention</option><option value="Birthday Blessing">Thanksgiving and Birthday Blessing</option><option value="Fast Recovery">For fast recovery</option><option value="Souls">For the Soul</option></select>'+
+'<div class="dynamic"></div>';
+document.getElementById("intentions").appendChild(box);
+box.querySelector(".itype").addEventListener("change",()=>renderIntention(box));
+renderIntention(box);
+}
+function renderIntention(box){
+const type=box.querySelector(".itype").value, d=box.querySelector(".dynamic");
+let s="";
+if(type==="Thanksgiving")s='<label>For Thanksgiving</label><div class="offeredList"></div><button type="button" class="addOffered mini" onclick="addOffered(this)">+ Add Offered by</button>';
+if(type==="Special Intention")s='<label>For Special Intention *</label><input class="subject" required placeholder="Enter special intention"><label>Offered by</label><div class="offeredList"></div><button type="button" class="addOffered mini" onclick="addOffered(this)">+ Add Offered by</button>';
+if(type==="Birthday Blessing")s='<label>Thanksgiving and Birthday Blessing of *</label><input class="subject" required placeholder="Name"><label>Offered by</label><div class="offeredList"></div><button type="button" class="addOffered mini" onclick="addOffered(this)">+ Add Offered by</button>';
+if(type==="Fast Recovery")s='<label>For fast recovery of *</label><input class="subject" required placeholder="Name"><label>Offered by</label><div class="offeredList"></div><button type="button" class="addOffered mini" onclick="addOffered(this)">+ Add Offered by</button>';
+if(type==="Souls")s='<label>For the Soul of *</label><textarea class="souls" required placeholder="Enter one or more names of the deceased, one per line."></textarea><div class="small">Each soul is counted separately for the calculation.</div><label>Offered by</label><div class="offeredList"></div><button type="button" class="addOffered mini" onclick="addOffered(this)">+ Add Offered by</button>';
+d.innerHTML=s;
+if(s){addOffered(d.querySelector(".addOffered"))}
+updateTotal();
+}
+function addOffered(btn){
+const box=btn.closest(".intention"),list=box.querySelector(".offeredList"),row=document.createElement("div");
+row.className="offeredRow";row.innerHTML='<input class="offered" required placeholder="Name to appear"><button type="button" class="remove mini" onclick="this.parentElement.remove();updateTotal()">Remove</button>';
+list.appendChild(row);updateTotal();
 }
 function removeIntention(btn){btn.closest(".intention").remove();updateTotal()}
-function updateTotal(){let n=document.querySelectorAll(".intention").length;document.getElementById("count").textContent=n;document.getElementById("total").textContent="₱"+(n*100)}
+function soulsCount(text){return text.split(/\n|,/).map(x=>x.trim()).filter(Boolean).length}
+function intentionAmount(box){
+const type=box.querySelector(".itype").value, offered=box.querySelectorAll(".offered").length;
+if(!type)return 0;
+if(type==="Souls"){const n=soulsCount(box.querySelector(".souls")?.value||"");return n*RATE + Math.max(0,offered-1)*RATE}
+return RATE + Math.max(0,offered-1)*RATE
+}
+function updateTotal(){
+let total=0;
+document.querySelectorAll(".intention").forEach(x=>{total+=intentionAmount(x)});
+total+=Math.max(0,Number(donation.value)||0);
+document.getElementById("total").textContent="₱"+total.toLocaleString("en-PH");
+}
+document.getElementById("intentions").addEventListener("input",updateTotal);
 addIntention();
+
+
+const ones=["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
+const tens=["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
+function wordsUnder1000(n){
+ n=Math.floor(n);let s="";
+ if(n>=100){s+=ones[Math.floor(n/100)]+" Hundred";n%=100;if(n)s+=" ";}
+ if(n>=20){s+=tens[Math.floor(n/10)];n%=10;if(n)s+="-"+ones[n];}
+ else if(n>0)s+=ones[n];
+ return s;
+}
+function amountWords(n){
+ n=Math.round(Number(n)||0);
+ if(n===0)return"Zero Pesos";
+ let s="";
+ if(n>=1000000){s+=wordsUnder1000(Math.floor(n/1000000))+" Million ";n%=1000000}
+ if(n>=1000){s+=wordsUnder1000(Math.floor(n/1000))+" Thousand ";n%=1000}
+ if(n>0)s+=wordsUnder1000(n)+" ";
+ return s.trim()+" Pesos";
+}
+function showReceipt(r){
+ document.getElementById("receiptPrint").classList.remove("hidden");
+ document.getElementById("rcptName").textContent=r.parishioner;
+ document.getElementById("rcptAddress").textContent=r.address||"";
+ document.getElementById("rcptContact").textContent=r.contact||"";
+ document.getElementById("rcptWords").textContent=amountWords(r.total);
+ document.getElementById("rcptFigures").textContent="₱"+Number(r.total).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2});
+ document.getElementById("rcptTotal").textContent="₱"+Number(r.total).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2});
+ document.getElementById("rcptIntentions").innerHTML=r.intentions.map(x=>"• "+x.wording).join("<br>")+(r.donation>0?("<br>• Donation"): "");
+ document.getElementById("rcptRef").textContent=r.ref;
+ document.getElementById("rcptStatus").textContent=r.status;
+ document.getElementById("receiptPrint").scrollIntoView({behavior:"smooth"});
+}
 function records(){return JSON.parse(localStorage.getItem(KEY)||"[]")}
-function save(x){localStorage.setItem(KEY,JSON.stringify(x))}
-function newRef(){return "MI-"+new Date().getFullYear()+"-"+String(records().length+1).padStart(6,"0")}
+function save(a){localStorage.setItem(KEY,JSON.stringify(a))}
+function newRef(){return"MI-"+new Date().getFullYear()+"-"+String(records().length+1).padStart(6,"0")}
 document.getElementById("form").addEventListener("submit",e=>{
- e.preventDefault();
- if(date.value!==iso(tomorrow())){alert("Mass intentions can only be submitted one day before the Mass.");return}
- const rows=[...document.querySelectorAll(".intention")].map(x=>({type:x.querySelector(".itype").value,offeredBy:x.querySelector(".offered").value.trim(),names:x.querySelector(".inames").value.trim()}));
- if(!rows.length||rows.some(x=>!x.type||!x.offeredBy||!x.names)){alert("Please complete every intention.");return}
- const ref=newRef(), d=new Date(date.value+"T00:00:00"), sx=schedule[dayKey(d)].find(x=>x[0]===mass.value);
- const r={ref,parishioner:document.getElementById("parishioner").value.trim(),contact:document.getElementById("contact").value.trim(),email:document.getElementById("email").value.trim(),massDate:date.value,massTime:mass.value,massLabel:sx[1],language:sx[2],intentions:rows,total:rows.length*100,gcashReference:document.getElementById("gcashRef").value.trim(),status:"PENDING PAYMENT VERIFICATION",created:new Date().toISOString()};
- const a=records();a.push(r);save(a);
- document.getElementById("result").className="status";
- document.getElementById("result").innerHTML="<b>Request submitted successfully.</b><br>Reference: <b>"+ref+"</b><br>Mass: "+r.massDate+" • "+r.massLabel+" • "+r.language+"<br>Number of intentions: <b>"+rows.length+"</b><br>Total offering: <b>₱"+r.total+"</b><br>Status: <b>"+r.status+"</b><br><br>Keep this reference number for status checking.";
- e.target.reset();document.getElementById("intentions").innerHTML="";id=0;addIntention();updateTotal();mass.innerHTML='<option value="">Select Mass date first</option>';date.min=iso(tomorrow());
+e.preventDefault();
+if(date.value!==iso(tomorrow())){alert("Mass intentions can only be submitted one day before the Mass.");return}
+const boxes=[...document.querySelectorAll(".intention")];
+const items=boxes.map(box=>{
+const type=box.querySelector(".itype").value,subject=box.querySelector(".subject")?.value.trim()||"",souls=box.querySelector(".souls")?.value.trim()||"",offered=[...box.querySelectorAll(".offered")].map(x=>x.value.trim());
+let wording="";
+if(type==="Thanksgiving")wording="For Thanksgiving offered by: "+offered.join("; ");
+if(type==="Special Intention")wording="For Special Intention "+subject+" offered by: "+offered.join("; ");
+if(type==="Birthday Blessing")wording="Thanksgiving and Birthday Blessing of "+subject+" offered by: "+offered.join("; ");
+if(type==="Fast Recovery")wording="For fast recovery of "+subject+" offered by: "+offered.join("; ");
+if(type==="Souls")wording="For the Soul of "+souls.split(/\n|,/).map(x=>x.trim()).filter(Boolean).join(", ")+" offered by: "+offered.join("; ");
+return{type,subject,souls,offered,wording,amount:intentionAmount(box)}
+});
+if(!items.length||items.some(x=>!x.type||!x.offered.length||x.offered.some(v=>!v)||(x.type==="Souls"&&!x.souls)||(x.type!=="Souls"&&!x.subject))){alert("Please complete every intention and Offered by entry.");return}
+const d=new Date(date.value+"T00:00:00"),sx=schedule[dayKey(d)].find(x=>x[0]===mass.value);
+const total=items.reduce((a,x)=>a+x.amount,0)+(Number(donation.value)||0),ref=newRef();
+const r={ref,parishioner:parishioner.value.trim(),address:document.getElementById("address").value.trim(),contact:contact.value.trim(),email:email.value.trim(),massDate:date.value,massTime:mass.value,massLabel:sx[1],language:sx[2],intentions:items,donation:Number(donation.value)||0,total,gcashReference:gcashRef.value.trim(),status:"PENDING PAYMENT VERIFICATION",created:new Date().toISOString()};
+const a=records();a.push(r);save(a);showReceipt(r);
+result.className="status";result.innerHTML="<b>Request submitted successfully.</b><br>Reference: <b>"+ref+"</b><br>Mass: "+r.massDate+" • "+r.massLabel+" • "+r.language+"<br>Total amount to pay: <b>₱"+total.toLocaleString("en-PH")+"</b><br>Status: <b>"+r.status+"</b><br><br>Keep your reference number for status checking.";
+e.target.reset();document.getElementById("intentions").innerHTML="";id=0;addIntention();mass.innerHTML='<option value="">Select Mass date first</option>';date.min=iso(tomorrow());updateTotal();
 });
 function checkStatus(){
- const q=document.getElementById("ref").value.trim().toUpperCase(),r=records().find(x=>x.ref===q);
- document.getElementById("status").innerHTML=r?'<div class="status"><b>'+r.ref+'</b><br>Status: <b>'+r.status+'</b><br>Mass: '+r.massDate+' • '+r.massLabel+' • '+r.language+'<br>Intentions: '+r.intentions.length+'<br>Total: <b>₱'+r.total+'</b></div>':'<div class="notice" style="margin-top:14px">No request found. Please check your reference number.</div>';
+const q=document.getElementById("ref").value.trim().toUpperCase(),r=records().find(x=>x.ref===q);
+status.innerHTML=r?'<div class="status"><b>'+r.ref+'</b><br>Status: <b>'+r.status+'</b><br>Mass: '+r.massDate+' • '+r.massLabel+' • '+r.language+'<br>Total amount to pay: <b>₱'+r.total.toLocaleString("en-PH")+'</b></div>':'<div class="notice" style="margin-top:14px">No request found. Please check your reference number.</div>';
 }
 </script>
-</body>
-</html>
+</body></html>
