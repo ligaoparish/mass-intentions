@@ -40,12 +40,22 @@ footer{background:var(--deep);color:#eadfca;padding:28px 16px}.foot{max-width:11
  .receipt{border:0;margin:0;max-width:none;box-shadow:none;padding:25mm 18mm}
  .receiptActions{display:none!important}
 }
+
+.logoHeader{display:flex;justify-content:center;align-items:center;gap:18px;margin-bottom:18px}
+.logoHeader img{width:82px;height:82px;object-fit:contain;filter:drop-shadow(0 3px 5px #0005)}
+.parishSeal{width:82px;height:82px;border:3px solid #ead49a;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;position:relative;color:#701722;box-shadow:0 3px 8px #0005}
+.parishSeal .cross{font-size:40px;line-height:1;font-family:Georgia}.parishSeal .sealText{position:absolute;inset:7px;border:1px solid #c9a34a;border-radius:50%;font:700 7px Arial;letter-spacing:.08em;display:flex;align-items:flex-start;justify-content:center;padding-top:5px}
+.receiptLogos{display:flex;justify-content:center;align-items:center;gap:15px;margin-bottom:8px}.receiptLogos img{width:55px;height:55px;object-fit:contain}.receiptSeal{width:55px;height:55px;border:2px solid #701722;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#701722;font:25px Georgia;position:relative}.receiptSeal:after{content:"SSP";position:absolute;bottom:5px;font:700 7px Arial}
 </style>
 </head>
 <body>
-<div class="top">ST. STEPHEN THE PROTOMARTYR PARISH • LIGAO CITY, ALBAY</div>
+<div class="top">ST. STEPHEN THE PROTOMARTYR PARISH • LIGAO CITY, ALBAY • MASS INTENTIONS v11</div>
 <header><div class="hero">
-<div class="brand"><div class="seal">✝</div><div><h1>St. Stephen the Protomartyr Parish</h1><small>Guilid, Ligao City, Albay</small></div></div>
+<div class="logoHeader">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Coat_of_arms_of_the_Diocese_of_Legazpi.svg/960px-Coat_of_arms_of_the_Diocese_of_Legazpi.svg.png" alt="Diocese of Legazpi Coat of Arms">
+<div class="parishSeal"><div class="sealText">ST. STEPHEN • LIGAO CITY</div><div class="cross">✝</div></div>
+</div>
+<div class="brand"><div><h1>St. Stephen the Protomartyr Parish</h1><small>Guilid, Ligao City, Albay • Diocese of Legazpi</small></div></div>
 <div class="heroContent"><div class="kicker">A prayer offered in faith</div><h2>Offer a Mass Intention.</h2><p>Entrust your thanksgiving, birthday, special intention, prayers for healing, or prayers for the souls of the faithful departed to the Holy Mass.</p><button class="btn gold" onclick="document.getElementById('request').scrollIntoView()">Request an Intention</button></div>
 </div></header>
 <main>
@@ -67,13 +77,13 @@ footer{background:var(--deep);color:#eadfca;padding:28px 16px}.foot{max-width:11
 </div>
 
 <div class="intentions">
-<div class="head"><h4>Mass Intentions</h4><button type="button" id="addIntentionBtn" class="btn gold">+ Add Intention</button></div>
+<div class="head"><h4>Mass Intentions</h4><button type="button" id="addIntentionBtn" class="btn gold" onclick="addIntention(); return false;">+ Add Intention</button></div>
 <div id="intentions"></div>
 </div>
 
 <div class="donation">
 <label>Donation (Optional)</label>
-<input id="donation" type="number" min="0" step="100" value="0" placeholder="Enter donation amount">
+<input id="donation" type="number" min="0" step="100" value="0" placeholder="Enter donation amount" oninput="updateTotal()" onchange="updateTotal()">
 <div class="small">A donation is separate from the Mass intention offering and will be included in the total amount to pay.</div>
 </div>
 
@@ -92,6 +102,10 @@ footer{background:var(--deep);color:#eadfca;padding:28px 16px}.foot{max-width:11
 
 <div id="receiptPrint" class="receipt hidden">
   <div class="receiptHead">
+    <div class="receiptLogos">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Coat_of_arms_of_the_Diocese_of_Legazpi.svg/960px-Coat_of_arms_of_the_Diocese_of_Legazpi.svg.png" alt="Diocese of Legazpi">
+      <div class="receiptSeal">✝</div>
+    </div>
     <div class="dio">DIOCESE OF LEGAZPI</div>
     <div class="parish">Parish of St. Stephen the Protomartyr</div>
     <div class="city">Ligao City</div>
@@ -193,13 +207,11 @@ function intentionAmount(box){
  return (chargeable + Math.max(0,offered-1))*RATE*masses;
 }
 function updateTotal(){
+ const donationEl=document.getElementById("donation");
  let total=0;document.querySelectorAll(".intention").forEach(x=>total+=intentionAmount(x));
- total+=Math.max(0,Number(donation.value)||0);
+ total+=Math.max(0,Number(donationEl?.value)||0);
  document.getElementById("total").textContent="₱"+total.toLocaleString("en-PH");
 }
-document.getElementById("intentions").addEventListener("input",updateTotal);
-document.getElementById("intentions").addEventListener("change",updateTotal);
-document.getElementById("addIntentionBtn").addEventListener("click",addIntention);
 addIntention();
 
 const ones=["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
@@ -245,7 +257,7 @@ document.getElementById("form").addEventListener("submit",e=>{
  const r={ref,parishioner:parishioner.value.trim(),address:document.getElementById("address").value.trim(),contact:contact.value.trim(),email:email.value.trim(),intentions:items,donation:Number(donation.value)||0,total,gcashReference:gcashRef.value.trim(),status:"PENDING PAYMENT VERIFICATION",created:new Date().toISOString()};
  const a=records();a.push(r);save(a);showReceipt(r);
  result.className="status";result.innerHTML="<b>Request submitted successfully.</b><br>Reference: <b>"+ref+"</b><br>Total amount to pay: <b>₱"+total.toLocaleString("en-PH")+"</b><br>Status: <b>"+r.status+"</b><br><br>Keep your reference number for status checking.";
- e.target.reset();donation.value=0;document.getElementById("intentions").innerHTML="";id=0;addIntention();updateTotal();
+ e.target.reset();const resetDonation=document.getElementById("donation");if(resetDonation)resetDonation.value=0;document.getElementById("intentions").innerHTML="";id=0;addIntention();updateTotal();
 });
 function checkStatus(){
  const q=document.getElementById("ref").value.trim().toUpperCase(),r=records().find(x=>x.ref===q);
