@@ -50,10 +50,13 @@ footer{background:var(--deep);color:#eadfca;padding:28px 16px}.foot{max-width:11
 .parishLogoImg{display:block;width:310px;max-width:72vw;height:auto;object-fit:contain;margin:0 auto 14px;border-radius:8px}
 .receiptCombinedLogo{display:block;width:230px;max-width:80%;height:auto;object-fit:contain;margin:0 auto 9px}
 @media(max-width:720px){.logoHeader img{width:185px;height:125px}.receiptLogos img{width:125px;height:80px}.parishLogoImg{width:250px}.receiptCombinedLogo{width:190px}}
+
+.receiptPrimary{background:#701722!important;color:#fff!important}
+.receiptSecondary{background:#f1e5c8!important;color:#4b2b16!important}
 </style>
 </head>
 <body>
-<div class="top">ST. STEPHEN THE PROTOMARTYR PARISH • LIGAO CITY, ALBAY • MASS INTENTIONS v15</div>
+<div class="top">ST. STEPHEN THE PROTOMARTYR PARISH • LIGAO CITY, ALBAY • MASS INTENTIONS v17</div>
 <header><div class="hero">
 <div class="logoHeader">
 <img class="parishLogoImg" src="sspp_logo.jpg" alt="Diocese of Legazpi and St. Stephen the Protomartyr Parish Ligao City logos">
@@ -121,11 +124,13 @@ footer{background:var(--deep);color:#eadfca;padding:28px 16px}.foot{max-width:11
   <div class="receiptFor">for</div>
   <div id="rcptIntentions" class="receiptIntentions"></div>
   <div class="receiptTotal"><span>Total:</span><span id="rcptTotal"></span></div>
+  <div style="margin-top:12px;font:13px Arial;color:#333"><b>GCash Reference:</b> <span id="rcptGcash"></span></div>
+  <div style="margin-top:5px;font:13px Arial;color:#333"><b>Payment Status:</b> <span id="rcptPaymentStatus"></span></div>
   <div class="receiptThank">Thank You!</div>
   <div class="receiptRef">Receipt No.: <span id="rcptRef"></span><br>Payment Status: <span id="rcptStatus"></span></div>
   <div class="receiptActions">
-    <button class="wine" onclick="window.print()">Print Receipt</button>
-    <button onclick="document.getElementById('receiptPrint').classList.add('hidden')">Close</button>
+    <button type="button" class="receiptPrimary" onclick="window.print()">🖨 Print Receipt</button>
+    <button type="button" class="receiptSecondary" onclick="startNewRequest()">↩ New Mass Intention</button>
   </div>
 </div>
 <footer><div class="foot"><div><h4>St. Stephen the Protomartyr Parish</h4><p>San Esteban St., Guilid, Ligao City, Albay</p><p>st.stephenprotomartyrparish@gmail.com</p></div><div><h4>Mass Intentions</h4><p>Online request • One-day advance</p></div><div><h4>GCash</h4><p>0927 835 9644</p><p>Payment verification by parish staff</p></div></div></footer>
@@ -228,6 +233,8 @@ function showReceipt(r){
  document.getElementById("rcptTotal").textContent="₱"+Number(r.total).toLocaleString("en-PH",{minimumFractionDigits:2});
  document.getElementById("rcptIntentions").innerHTML=r.intentions.map(x=>"• "+x.wording+"<br><span style=\"margin-left:14px;font-size:12px\">"+x.schedules.map(v=>v.date+" • "+v.timeLabel+" • "+v.language).join("<br>")+"</span>").join("<br><br>")+(r.donation>0?"<br><br>• Donation":"");
  document.getElementById("rcptRef").textContent=r.ref;document.getElementById("rcptStatus").textContent=r.status;
+ document.getElementById("rcptGcash").textContent=r.gcashReference||"Not provided";
+ document.getElementById("rcptPaymentStatus").textContent=r.status;
  document.getElementById("receiptPrint").scrollIntoView({behavior:"smooth"});
 }
 function records(){return JSON.parse(localStorage.getItem(KEY)||"[]")}
@@ -300,9 +307,39 @@ document.getElementById("form").addEventListener("submit",e=>{
  const resetDonation=document.getElementById("donation");if(resetDonation)resetDonation.value=0;
  document.getElementById("intentions").innerHTML="";id=0;addIntention();updateTotal();
 });
+function startNewRequest(){
+ document.getElementById("receiptPrint").classList.add("hidden");
+ document.getElementById("result").classList.add("hidden");
+ document.getElementById("ref").value="";
+ window.scrollTo({top:document.getElementById("request").offsetTop-20,behavior:"smooth"});
+}
 function checkStatus(){
- const q=document.getElementById("ref").value.trim().toUpperCase(),r=records().find(x=>x.ref===q);
- status.innerHTML=r?'<div class="status"><b>'+r.ref+'</b><br>Status: <b>'+r.status+'</b><br>Total amount to pay: <b>₱'+r.total.toLocaleString("en-PH")+'</b><hr>'+r.intentions.map(x=>'<b>'+x.wording+'</b><br>'+x.schedules.map(v=>v.date+" • "+v.timeLabel+" • "+v.language).join("<br>")).join("<br><br>")+'</div>':'<div class="notice" style="margin-top:14px">No request found. Please check your reference number.</div>';
+ const refInput=document.getElementById("ref");
+ const statusBox=document.getElementById("status");
+ const q=(refInput?.value||"").trim().toUpperCase();
+ if(!q){
+   statusBox.innerHTML='<div class="notice" style="margin-top:14px">Please enter your Mass Intention Reference Number.</div>';
+   return;
+ }
+ const found=records().find(x=>String(x.ref||"").toUpperCase()===q);
+ if(!found){
+   statusBox.innerHTML='<div class="notice" style="margin-top:14px"><b>No request found.</b><br>Please check the reference number and try again.</div>';
+   return;
+ }
+ const intentionHtml=(found.intentions||[]).map(x=>{
+   const schedules=(x.schedules||[]).map(v=>v.date+" • "+v.timeLabel+" • "+v.language).join("<br>");
+   return '<div style="margin-bottom:14px"><b>'+escapeHtml(x.wording||"Mass Intention")+'</b><br><span style="font-size:12px">'+schedules+'</span></div>';
+ }).join("");
+ statusBox.innerHTML='<div class="status" style="margin-top:14px">'+
+   '<b>Reference:</b> '+escapeHtml(found.ref)+'<br>'+
+   '<b>Status:</b> '+escapeHtml(found.status||"PENDING PAYMENT VERIFICATION")+'<br>'+
+   '<b>Total amount:</b> ₱'+Number(found.total||0).toLocaleString("en-PH",{minimumFractionDigits:2})+
+   (found.gcashReference?'<br><b>GCash Reference:</b> '+escapeHtml(found.gcashReference):"")+
+   '<hr><b>Mass Intentions</b><br><br>'+intentionHtml+
+   '</div>';
+}
+function escapeHtml(value){
+ return String(value??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
 }
 </script>
 </body></html>
